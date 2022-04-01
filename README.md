@@ -1,5 +1,5 @@
-# experiment-tsad
-Source code and supplimentary materials for "An Experiment Evaluation of Anomaly Detection in Time Series"
+Source code and supplementary materials for "An Experiment Evaluation of Anomaly Detection in Time Series [EB & A]".
 
-The dataset is so big so we put it in another Google Drive, take it if you need.
-https://drive.google.com/drive/folders/1BJuiWMmBzK2UeiGahVoX2ofqlShELjkN?usp=sharing
+* Source code is available in `src` folder and jar package is in `lib` folder
+* The dataset is too large to be kept in git, so we put it in Google Drive as follows: https://drive.google.com/drive/folders/1BJuiWMmBzK2UeiGahVoX2ofqlShELjkN?usp=sharing
+* Extra experimental results can be found in the technical report here
