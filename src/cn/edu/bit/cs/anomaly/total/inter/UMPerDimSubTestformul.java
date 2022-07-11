@@ -26,18 +26,18 @@ public class UMPerDimSubTestformul {
     FileHandler fh = new FileHandler();
 
     // String[] vars = {"exercise", "exathlon", "systhetic w/o correlation"};
-    String[] vars = {"exercise","exathlon","mul_ncor_subg","mul_cor_subg","mul_ncor_mix","mul_cor_mix"};
-    int[] dims = {3,19,3,3,3,3};
+    String[] vars = {"exercise","exathlon","mul_ncor_subg","mul_cor_subg"};
+    int[] dims = {3,19,3,3};
     //String[] vars= {"mul_ncor_subg","mul_cor_subg","mul_ncor_mix","mul_cor_mix"};
     //int[] dims = {3,3,3,3};
     boolean[] willOperate = {true, true};
 
     String[] algNames = {"PBAD", "LRRDS"};
-    String[] metricNames = {"precision", "recall"};
+    String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
     final int ALGNUM = algNames.length;
-    final int METRICNUM = 2;  // precision, recall
+    final int METRICNUM = 3;  // precision, recall
 
     long[][] algtime = new long[ALGNUM][2];
     long[][] totaltime = new long[VARSIZE][ALGNUM];
@@ -70,7 +70,7 @@ public class UMPerDimSubTestformul {
       Map<String, Object> dsMap = meta.getDataset().get(dsName);
       String dir = (String)dsMap.get("dataDir");
       String filePrefix = (String)dsMap.get("rawPrefix");
-      String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+      String rawPath = String.format("%s/test/%s.csv", dir, filePrefix);
 
       // PBAD
       algIndex = 0;

@@ -24,10 +24,10 @@ public class MulPointTest {
 
   public static void main(String[] args) {
     FileHandler fh = new FileHandler();
-    String[] vars = {"ecg", "dlr", "smtp"};
+    String[] vars = {"ecg",  "smtp"};
 
     String[] algNames = {"CPOD", "NETS", "Stare", "Luminol", "SHESD"};
-    boolean[] willOperate = {true, true, true, true, true};
+    boolean[] willOperate = {true, true, true, false, true};
     String[] metricNames = {"precision", "recall", "fmeasure"};
 
     final int VARSIZE = vars.length;
@@ -58,7 +58,7 @@ public class MulPointTest {
       Map<String, Object> dsMap = meta.getDataset().get(dsName);
       String dir = (String) dsMap.get("dataDir");
       String filePrefix = (String) dsMap.get("rawPrefix");
-      String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+      String rawPath = String.format("%s/%s/%s.csv", dir,"test", filePrefix);
 
       // CPOD
       algIndex = 0;

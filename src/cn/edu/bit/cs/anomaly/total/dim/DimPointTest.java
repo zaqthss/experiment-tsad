@@ -86,7 +86,7 @@ public class DimPointTest {
     // real anomaly range is not affected by dimension, since the label is across all dims
     // the file is read only once, but will be extracted according to the tested dimensions
     for (int index = 0; index < VARSIZE; ++index) {
-      String rawPath = String.format("%s/%s", dir, filePrefix);
+      String rawPath = String.format("%s/%s/%s", dir,"test", filePrefix);
       System.out.println("test with dim " + vars[index] + " on " + rawPath + " begin");
       Map<Integer, TreeMap<Long, TimePointMulDim>> realAnomalyMulMap = new HashMap<>();
       Map<Integer, TimeSeries[]> seriesMap = new HashMap<>();

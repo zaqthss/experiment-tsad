@@ -26,8 +26,8 @@ public class SANDTest {
     // SAND sand=new SAND(T,init_length,batch_size,pattern_length);
     Map<String, Object> arg_list = new HashMap<String, Object>();
     arg_list.put("k", 6);
-    arg_list.put("batch_size", 2000);
-    arg_list.put("pattern_length", 50);
+    arg_list.put("batch_size", 5000);
+    arg_list.put("pattern_length", 150);
     arg_list.put("top_k", 9);
     long startTime =  System.currentTimeMillis();
     SAND sand = new SAND();

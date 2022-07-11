@@ -27,7 +27,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 public class NPTune {
-	private final static Logger LOGGER = Logger.getLogger(PBADTune.class.getName());
+	private final static Logger LOGGER = Logger.getLogger(NPTune.class.getName());
 	public static void main(String[] args) {
 		Locale.setDefault(new Locale("en", "EN"));
 	    ArgumentParser parser = ArgumentParsers.newFor("np_tune").build().
@@ -75,13 +75,13 @@ public class NPTune {
 	        }
 	        
 	     // read file
-	        String rawPath = String.format("%s/%s.csv", dir, filePrefix);
-	        LOGGER.info("loading " + rawPath);
+	        String rawPath = String.format("%s/valN/%s.csv", dir, filePrefix);
+	        System.out.println("loading " + rawPath);
 	        FileHandler fh = new FileHandler();
 	        TimeSeries ts = fh.readDataWithLabel(rawPath);
 	        
 	     // run algorithm
-	        LOGGER.info("run np: "+batchsize+" "+max_sample+" "+sub_len+" "+scale+" "+top_k);
+	        System.out.println("run np: "+batchsize+" "+max_sample+" "+sub_len+" "+scale+" "+top_k);
 	        Map<String,Object> params = new HashMap<>();
 	        params.put("batchsize", batchsize);
 	        params.put("max_sample", max_sample);
@@ -93,9 +93,9 @@ public class NPTune {
 	        np.run();
 	        
 	        // write result
-	        //LOGGER.info("dumping into " + resultPath);
+	        System.out.println("dumping into " + resultPath);
 	        pw = new PrintWriter(new FileWriter(resultPath));
-	        if (meta.getSets().contains(dsName) || anomalyType.equals("point")) {
+	        if (anomalyType.equals("point")) {
 	          TreeMap<Long, TimePoint> predictAnomaly = DataHandler.findAnomalyPoint(ts);
 	          for (Long timestamp: predictAnomaly.keySet()) {
 	            pw.println(timestamp);
@@ -108,7 +108,7 @@ public class NPTune {
 	          }
 	        }
 	        pw.close();
-	        LOGGER.info("done");
+	        System.out.println("done");
 	    }catch (ArgumentParserException e) {
 	        parser.handleError(e);
 	    } catch (IOException e) {

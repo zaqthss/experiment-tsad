@@ -8,7 +8,7 @@ import cn.edu.bit.cs.anomaly.util.Constants.IS_ANOMALY;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class Luminol implements SingleDimAlgorithm {
+public class Luminol implements UniDimAlgorithm {
 
   private int precision;
   private int lag_window_size;

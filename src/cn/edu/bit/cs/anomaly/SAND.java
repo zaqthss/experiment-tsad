@@ -19,7 +19,7 @@ import cn.edu.bit.cs.anomaly.util.clustering.Clusters;
 import cn.edu.bit.cs.anomaly.util.clustering.KShape;
 import cn.edu.bit.cs.anomaly.util.stamp.Mp;
 
-public class SAND implements SingleDimAlgorithm {
+public class SAND implements UniDimAlgorithm {
   public TimeSeries timeseries;
   public ArrayList<Double> ts;
   public int k = 6;

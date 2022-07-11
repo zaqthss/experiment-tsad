@@ -1,6 +1,8 @@
 package cn.edu.bit.cs.anomaly.total.inter;
 
 import cn.edu.bit.cs.anomaly.CPOD;
+import cn.edu.bit.cs.anomaly.GrammarViz;
+import cn.edu.bit.cs.anomaly.Merlin;
 import cn.edu.bit.cs.anomaly.NETS;
 import cn.edu.bit.cs.anomaly.NeighborProfile;
 import cn.edu.bit.cs.anomaly.PBAD;
@@ -39,7 +41,7 @@ public class SPLengthTest {
         ArgumentParsers.newFor("SPLengthTest")
             .build()
             .description("input ds");
-    parser.addArgument("ds").dest("ds").type(String.class).choices("exathlon_sp", "uni_subg_sp", "uni_subs_sp");
+    parser.addArgument("ds").dest("ds").type(String.class).choices("exathlon_sp", "uni_subg_sp", "uni_subs_sp","uni_subt_sp");
     MetaData meta = SubMetaData.getInstance();
     Namespace res = parser.parseArgs(args);
     String dsName = res.getString("ds");
@@ -50,14 +52,14 @@ public class SPLengthTest {
     FileHandler fh = new FileHandler();
 
     String[] vars = {"20","30","40","50","60","70","100"};
-    boolean[] willOperate = {false, false, false, true, true, true, true};
+    boolean[] willOperate = {false, false, false, true,false, false, false, false};
 
-    String[] algNames = {"PBAD", "SAND", "NP", "CPOD", "NETS", "Stare", "SHESD"};
-    String[] metricNames = {"precision", "recall"};
+    String[] algNames = {"PBAD", "SAND", "NP","MERLIN", "CPOD", "NETS", "Stare", "SHESD"};
+    String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
     final int ALGNUM = algNames.length;
-    final int METRICNUM = 2;  // precision, recall
+    final int METRICNUM = 3;  
 
     long[][] algtime = new long[ALGNUM][2];
     long[][] totaltime = new long[VARSIZE][ALGNUM];
@@ -70,6 +72,7 @@ public class SPLengthTest {
     PBAD pbad = null;
     SAND sand = null;
     NeighborProfile np = null;
+    Merlin merlin=null;
     CPOD cpod = null;
     NETS nets = null;
     Stare stare = null;
@@ -89,7 +92,7 @@ public class SPLengthTest {
       Map<String, ArrayList<Range>> realAnomalyMap = new HashMap<>();
       Map<String, TimeSeries> seriesMap = new HashMap<>();
       Map<String, TimeSeriesMulDim> seriesMulMap = new HashMap<>();
-      String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+      String rawPath = String.format("%s/test/%s.csv", dir, filePrefix);
       // PBAD
       algIndex = 0;
       if (willOperate[algIndex]) {
@@ -173,7 +176,37 @@ public class SPLengthTest {
         DataHandler.evaluate(
             alpha, bias, predictAnomaly, realAnomalyMap.get(dsName), metrics[index][algIndex]);
       }
-      meta = PointMetaData.getInstance();
+   // merlin
+      algIndex++;
+      if (willOperate[algIndex]) {
+        System.out.println(algNames[algIndex] + " begin");
+        if (!seriesMap.containsKey(dsName)) {
+          timeseries = fh.readDataWithLabel(rawPath);
+          seriesMap.put(dsName, timeseries);
+          if (!realAnomalyMap.containsKey(dsName)) {
+            ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeseries);
+            realAnomalyMap.put(dsName, realAnomaly);
+          }
+        } else {
+          timeseries = seriesMap.get(dsName);
+        }
+        algtime[algIndex][0] = System.currentTimeMillis();
+        merlin = new Merlin();
+        Map<String, Object> merlinParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+        merlinParams.put("minL", Integer.parseInt(vars[index]));
+        merlinParams.put("maxL", Integer.parseInt(vars[index]));
+        merlin.init(merlinParams, timeseries);
+        merlin.run();
+        algtime[algIndex][1] = System.currentTimeMillis();
+        predictAnomaly = DataHandler.findAnomalyRange(timeseries);
+        String dumpPath = String.format(
+            "%s/%s_%s_%s_l_%s.csv", dumpDir, algNames[algIndex], filePrefix, vars[index], "sub");
+        fh.writeAnomalyRange(predictAnomaly, dumpPath);
+        DataHandler.evaluate(
+            alpha, bias, predictAnomaly, realAnomalyMap.get(dsName), metrics[index][algIndex]);
+      }
+      
+      //meta = PointMetaData.getInstance();
       // CPOD
       algIndex++;
       if (willOperate[algIndex]) {
@@ -298,7 +331,7 @@ public class SPLengthTest {
         totaltime[index][algi] += algtime[algi][1] - algtime[algi][0];
       }
       // write results
-      fh.writeResults("length", "length-sub-point-" + dsName, vars, algNames,
+      fh.writeResults("length", "length1-sub-" + dsName, vars, algNames,
           metricNames, totaltime, metrics, 1);
     } // end of rIndex
   }

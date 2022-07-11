@@ -1,13 +1,12 @@
 package cn.edu.bit.cs.anomaly.total.tune;
 
 import cn.edu.bit.cs.anomaly.SHESD;
-import cn.edu.bit.cs.anomaly.SingleDimAlgorithm;
+import cn.edu.bit.cs.anomaly.UniDimAlgorithm;
 import cn.edu.bit.cs.anomaly.entity.Range;
 import cn.edu.bit.cs.anomaly.entity.TimePoint;
 import cn.edu.bit.cs.anomaly.entity.TimeSeries;
 import cn.edu.bit.cs.anomaly.total.MetaData;
 import cn.edu.bit.cs.anomaly.total.PointMetaData;
-import cn.edu.bit.cs.anomaly.total.SubMetaData;
 import cn.edu.bit.cs.anomaly.util.DataHandler;
 import cn.edu.bit.cs.anomaly.util.FileHandler;
 import java.io.File;
@@ -82,12 +81,12 @@ public class SHESDTune {
 
       // read file
       String rawPath = String.format("%s/%s.csv", dir, filePrefix);
-      LOGGER.info("loading " + rawPath);
+      System.out.println("loading " + rawPath);
       FileHandler fh = new FileHandler();
       TimeSeries ts = fh.readDataWithLabel(rawPath);
 
       // run algorithm
-      LOGGER.info("run SHESD");
+      System.out.println("run SHESD");
       Map<String, Object> params = new HashMap<>();
 
       params.put("seasonality", seasonality);
@@ -95,7 +94,7 @@ public class SHESDTune {
       params.put("alpha", alpha);
       params.put("anomsThreshold", anomsThreshold);
 
-      SingleDimAlgorithm alg = new SHESD();
+      UniDimAlgorithm alg = new SHESD();
       alg.init(params, ts);
       alg.run();
 
@@ -114,7 +113,7 @@ public class SHESDTune {
         }
       }
       pw.close();
-      LOGGER.info("done");
+      System.out.println("done");
 
     } catch (ArgumentParserException e) {
       parser.handleError(e);

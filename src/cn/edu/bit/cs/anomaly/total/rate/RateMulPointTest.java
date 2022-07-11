@@ -48,9 +48,9 @@ public class RateMulPointTest {
 
     FileHandler fh = new FileHandler();
 
-    String[] vars = { "0.1"};
-    String[] algNames = {"CPOD", "NETS", "Stare",  "SHESD", "Luminol"};
-    boolean[] willOperate = {true, true, true, true, true};
+    String[] vars = { "0.05","0.1","0.15","0.2","0.25","0.3","0.35","0.4","0.45"};
+    String[] algNames = {"CPOD", "NETS", "Stare",   "Luminol","SHESD"};
+    boolean[] willOperate = {true, true, true, false, true};
     String[] metricNames = {"precision", "recall", "fmeasure"};
 
     final int VARSIZE = vars.length;
@@ -72,7 +72,7 @@ public class RateMulPointTest {
     SHESD shesd = null;
 
     for (int index = 0; index < VARSIZE; ++index) {
-      String rawPath = String.format("%s/%s_%s_%s_%s_", dir, filePrefix, anomalyType, size, vars[index]);
+      String rawPath = String.format("%s/%s/%s_%s_%s_%s_", dir,"test", filePrefix, anomalyType, size, vars[index]);
       System.out.println("test with anomaly rate " + vars[index] + " on " + rawPath + " begin");
       Map<Integer, TreeMap<Long, TimePointMulDim>> realAnomalyMulMap = new HashMap<>();
       Map<Integer, TimeSeries[]> seriesMap = new HashMap<>();

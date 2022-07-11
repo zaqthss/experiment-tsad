@@ -50,7 +50,7 @@ public class SizeUniPointTest {
     FileHandler fh = new FileHandler();
 
     // TODO: may change
-    String[] vars = {"1000", "5000", "10000", "20000", "50000", "100000"};
+    String[] vars = {"2000", "10000", "20000", "40000", "100000", "200000"};
     String[] algNames = {"CPOD", "NETS", "Stare", "Luminol",  "SHESD"};
     boolean[] willOperate = {true, true, true, true, true};
     String[] metricNames = {"precision", "recall", "fmeasure"};
@@ -74,7 +74,7 @@ public class SizeUniPointTest {
     SHESD shesd = null;
 
     for (int index = 0; index < VARSIZE; ++index) {
-      String rawPath = String.format("%s/%s_%s_%s_%s_", dir, filePrefix, anomalyType, vars[index], anomalyRate);
+      String rawPath = String.format("%s/%s/%s_%s_%s_%s_", dir,"test", filePrefix, anomalyType, vars[index], anomalyRate);
       System.out.println("test with size " + vars[index] + " on " + rawPath + " begin");
       Map<Integer, TreeMap<Long, TimePoint>> realAnomalyMap = new HashMap<>();
       Map<Integer, TreeMap<Long, TimePointMulDim>> realAnomalyMulMap = new HashMap<>();

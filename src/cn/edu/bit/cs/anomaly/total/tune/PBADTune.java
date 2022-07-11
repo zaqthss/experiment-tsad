@@ -75,13 +75,13 @@ public class PBADTune {
 	        }
 	        
 	     // read file
-	        String rawPath = String.format("%s/%s.csv", dir, filePrefix);
-	        LOGGER.info("loading " + rawPath);
+	        String rawPath = String.format("%s/valN/%s.csv", dir, filePrefix);
+	        System.out.println("loading " + rawPath);
 	        FileHandler fh = new FileHandler();
 	        TimeSeriesMulDim ts = fh.readMulDataWithLabel(rawPath);
 	        
 	     // run algorithm
-	        LOGGER.info("run pbad: "+window_size+" "+window_incr+" "+bin_size+" "+max_feature+" "+threshold);
+	        System.out.println("run pbad: "+window_size+" "+window_incr+" "+bin_size+" "+max_feature+" "+threshold);
 	        Map<String,Object> params = new HashMap<>();
 	        params.put("window_size", window_size);
 	        params.put("window_incr", window_incr);
@@ -93,9 +93,9 @@ public class PBADTune {
 	        pbad.run();
 	        
 	        // write result
-	        //LOGGER.info("dumping into " + resultPath);
+	        //System.out.println("dumping into " + resultPath);
 	        pw = new PrintWriter(new FileWriter(resultPath));
-	        if (meta.getSets().contains(dsName) || anomalyType.equals("point")) {
+	        if (anomalyType.equals("point")) {
 	          TreeMap<Long, TimePointMulDim> predictAnomaly = DataHandler.findAnomalyPoint(ts);
 	          for (Long timestamp: predictAnomaly.keySet()) {
 	            pw.println(timestamp);
@@ -108,7 +108,7 @@ public class PBADTune {
 	          }
 	        }
 	        pw.close();
-	        LOGGER.info("done");
+	        System.out.println("done");
 	    }catch (ArgumentParserException e) {
 	        parser.handleError(e);
 	    } catch (IOException e) {

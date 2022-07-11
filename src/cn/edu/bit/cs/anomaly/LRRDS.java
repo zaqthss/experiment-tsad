@@ -52,7 +52,6 @@ public class LRRDS implements MultiDimAlgorithm {
           tpm.setIs_anomaly(IS_ANOMALY.TRUE);
         }
       }*/
-    	System.out.println();
     	for(int i=0;i<anomaly_index.size();i++) {
     		double[] record = cp_profile[anomaly_index.get(i)];
     		for (int j = (int) record[2]; j <= Math.min((int) record[3],MulT.getLength()-1); j++) {
@@ -234,6 +233,11 @@ public class LRRDS implements MultiDimAlgorithm {
 		System.out.println(KM.toString());
 		Instances instances = KM.getClusterCentroids();
 		double[] ins0=instances.get(0).toDoubleArray();
+		
+		if(instances.size()==1) {
+			success=false;
+			return;
+		}
 		double[] ins1=instances.get(1).toDoubleArray();
 		if(ins0[0]<ins1[0]) {
 			anomaly_class=1;
@@ -250,7 +254,6 @@ public class LRRDS implements MultiDimAlgorithm {
 	        }
 	        x++;
 	    }
-	    System.out.println();
 	} catch (Exception e) {
 		e.printStackTrace();
 	}

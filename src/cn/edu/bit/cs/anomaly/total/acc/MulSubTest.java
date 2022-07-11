@@ -26,16 +26,16 @@ public class MulSubTest {
     //String[] vars = {"exercise", "exathlon", "swat", "smd"};
     //String[] vars = {"exercise_1k"};
     // String[] vars = {"exercise"};
-    String[] vars = {"exathlon"};
-    int[] dims = {19}; 
+    String[] vars = {"swat"};
+    int[] dims = {38}; 
     boolean[] willOperate = {true, false, false, false};
 
     String[] algNames = {"PBAD", "LRRDS", "SAND", "NP"};
-    String[] metricNames = {"precision", "recall"};
+    String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
     final int ALGNUM = algNames.length;
-    final int METRICNUM = 2; // precision, recall
+    final int METRICNUM = 3; // precision, recall
 
     long[][] algtime = new long[ALGNUM][2];
     long[][] totaltime = new long[VARSIZE][ALGNUM];
@@ -63,7 +63,7 @@ public class MulSubTest {
       Map<String, Object> dsMap = meta.getDataset().get(dsName);
       String dir = (String) dsMap.get("dataDir");
       String filePrefix = (String) dsMap.get("rawPrefix");
-      String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+      String rawPath = String.format("%s/test/%s.csv", dir, filePrefix);
 
       // PBAD
       algIndex = 0;
@@ -169,7 +169,7 @@ public class MulSubTest {
         totaltime[index][algi] += algtime[algi][1] - algtime[algi][0];
       }
       // write results
-      fh.writeResults("acc", "mul-sub", vars, algNames, metricNames, totaltime, metrics, 1);
+      fh.writeResults("acc", "mul-sub-", vars, algNames, metricNames, totaltime, metrics, 1);
     } // end of rIndex
   }
 }

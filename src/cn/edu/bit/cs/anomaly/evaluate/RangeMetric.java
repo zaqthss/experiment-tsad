@@ -12,6 +12,7 @@ import java.util.HashMap;
 public class RangeMetric {
     public double recall = 0;
     public double precision = 0;
+    public double fmeasure = 0;
 
     private ArrayList<Range> realAnomaly, predictAnomaly;
     private HashMap<Integer, Range> overlaps;
@@ -24,6 +25,7 @@ public class RangeMetric {
             double alpha, POS_BIAS bias, ArrayList<Range> realAnomaly, ArrayList<Range> predictAnomaly) {
         recall = 0;
         precision = 0;
+        fmeasure=0;
         overlaps = new HashMap<>();
 
         this.pos_bias = bias;
@@ -51,6 +53,7 @@ public class RangeMetric {
             precision += cardinalityFactor * mul;
         }
         precision = precision / pSize;
+        fmeasure = 2 * precision * recall / (precision + recall);
     }
 
     private int calcKey(int rIndex, int pIndex) {

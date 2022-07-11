@@ -30,8 +30,8 @@ public class SubInterFileDumper {
 	public int pMetric = 7;
     public String[] pMetricNames = {"precision", "recall", "fmeasure", "accuracy",
             "errorRate", "sensitive", "specificity"};
-    public int rMetric = 2;
-    public String[] rMetricNames = {"precision", "recall"};
+    public int rMetric = 3;
+    public String[] rMetricNames = {"precision", "recall","fmeasure"};
     
 	public static void main(String[] args) throws ArgumentParserException, IOException {
 		ArgumentParser parser = ArgumentParsers.newFor("FileDumper").build().
@@ -72,7 +72,7 @@ public class SubInterFileDumper {
             String dir = (String) dsMap.get("dataDir");
             String filePrefix = (String) dsMap.get("rawPrefix");
             assert (filePrefix.equals(rawName));
-            String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+            String rawPath = String.format("%s/test/%s.csv", dir, filePrefix);
             TimeSeriesMulDim ts = fh.readMulDataWithLabel(rawPath);
             seriesMap.put(rawName, ts);
             realAnomalyMapSub .put(rawName, DataHandler.findAnomalyRange(ts));
@@ -107,7 +107,7 @@ public class SubInterFileDumper {
                     resList.add(String.join(",", headList));
                     algResults.put(algName, resList);
                 } else {
-                    resList = algResults.get(algName);
+                  resList = algResults.get(algName);
                 }
                 List<String> paramList = new ArrayList<>();
                 if(params!=null) {
@@ -128,6 +128,7 @@ public class SubInterFileDumper {
                     rm.computeMetric(alpha, bias, realAnomalyMapSub.get(rawName), predictAnomaly);
                     paramList.add(String.format("%.3f", rm.precision));
                     paramList.add(String.format("%.3f", rm.recall));
+                    paramList.add(String.format("%.3f", rm.fmeasure));
                 }
                 resList.add(String.join(",", paramList));
             } // end of files

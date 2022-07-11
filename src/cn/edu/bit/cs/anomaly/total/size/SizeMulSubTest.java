@@ -55,9 +55,9 @@ public class SizeMulSubTest {
 
     // TODO: may change
     String[] vars = {"1000", "5000", "10000", "20000", "30000","50000"};
-    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP"};
-    boolean[] willOperate = {true, true, false, false};
-    String[] metricNames = {"precision", "recall"};
+    String[] algNames = {"PBAD", "LRRDS"};
+    boolean[] willOperate = {true, true};
+    String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
     final int ALGNUM = algNames.length;
@@ -82,7 +82,7 @@ public class SizeMulSubTest {
 
     for (int index = 0; index < VARSIZE; ++index) {
       String rawPath =
-          String.format("%s/%s_%s_len_%s_%s_%s_", dir, filePrefix, anomalyType, anomalyLength,
+          String.format("%s/test/%s_%s_len_%s_%s_%s_", dir, filePrefix, anomalyType, anomalyLength,
               vars[index], anomalyRate);
       System.out.println("test with size " + vars[index] + " on " + rawPath + " begin");
       Map<Integer, ArrayList<Range>> realAnomalyMap = new HashMap<>();
@@ -137,66 +137,6 @@ public class SizeMulSubTest {
           predictAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
           DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
               metrics[index][algIndex]);
-        }
-      }
-
-      // SAND
-      algIndex++;
-      if (willOperate[algIndex]) {
-        for (int seed : seeds) {
-          System.out.println(algNames[algIndex] + " begin on seed " + seed);
-          if (!seriesMap.containsKey(seed)) {
-            tsArray = seriesMap.get(seed);
-          } else if (seriesMulMap.containsKey(seed)) {
-            tsArray = seriesMulMap.get(seed).convert();
-          } else {
-            timeSeriesMulDim = fh.readMulDataWithLabel(rawPath + seed + ".csv");
-            tsArray = timeSeriesMulDim.convert();
-            seriesMulMap.put(seed, timeSeriesMulDim);
-            ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
-            realAnomalyMap.put(seed, realAnomaly);
-          }
-          algtime[algIndex][0] = System.currentTimeMillis();
-          sand = new SAND();
-          Map<String, Object> sandParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
-          for (TimeSeries ts : tsArray) {
-            sand.init(sandParams, ts);
-            sand.run();
-          }
-          algtime[algIndex][1] = System.currentTimeMillis();
-          totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
-          DataHandler.evaluate(
-              alpha, bias, tsArray, realAnomalyMap.get(seed), metrics[index][algIndex]);
-        }
-      }
-
-      // NP
-      algIndex++;
-      if (willOperate[algIndex]) {
-        for (int seed : seeds) {
-          System.out.println(algNames[algIndex] + " begin on seed " + seed);
-          if (!seriesMap.containsKey(seed)) {
-            tsArray = seriesMap.get(seed);
-          } else if (seriesMulMap.containsKey(seed)) {
-            tsArray = seriesMulMap.get(seed).convert();
-          } else {
-            timeSeriesMulDim = fh.readMulDataWithLabel(rawPath + seed + ".csv");
-            tsArray = timeSeriesMulDim.convert();
-            seriesMulMap.put(seed, timeSeriesMulDim);
-            ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
-            realAnomalyMap.put(seed, realAnomaly);
-          }
-          algtime[algIndex][0] = System.currentTimeMillis();
-          np = new NeighborProfile();
-          Map<String, Object> npParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
-          for (TimeSeries ts : tsArray) {
-            np.init(npParams, ts);
-            np.run();
-          }
-          algtime[algIndex][1] = System.currentTimeMillis();
-          totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
-          DataHandler.evaluate(
-              alpha, bias, tsArray, realAnomalyMap.get(seed), metrics[index][algIndex]);
         }
       }
 

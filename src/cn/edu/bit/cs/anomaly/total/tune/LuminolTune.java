@@ -1,13 +1,12 @@
 package cn.edu.bit.cs.anomaly.total.tune;
 
 import cn.edu.bit.cs.anomaly.Luminol;
-import cn.edu.bit.cs.anomaly.SingleDimAlgorithm;
+import cn.edu.bit.cs.anomaly.UniDimAlgorithm;
 import cn.edu.bit.cs.anomaly.entity.Range;
 import cn.edu.bit.cs.anomaly.entity.TimePoint;
 import cn.edu.bit.cs.anomaly.entity.TimeSeries;
 import cn.edu.bit.cs.anomaly.total.MetaData;
 import cn.edu.bit.cs.anomaly.total.PointMetaData;
-import cn.edu.bit.cs.anomaly.total.SubMetaData;
 import cn.edu.bit.cs.anomaly.util.Constants;
 import cn.edu.bit.cs.anomaly.util.DataHandler;
 import cn.edu.bit.cs.anomaly.util.FileHandler;
@@ -87,12 +86,12 @@ public class LuminolTune {
 
       // read file
       String rawPath = String.format("%s/%s.csv", dir, filePrefix);
-      LOGGER.info("loading " + rawPath);
+      System.out.println("loading " + rawPath);
       FileHandler fh = new FileHandler();
       TimeSeries ts = fh.readDataWithLabel(rawPath);
 
       // run algorithm
-      LOGGER.info("run Luminol");
+      System.out.println("run Luminol");
       Map<String, Object> params = new HashMap<>();
 
       params.put("precision", precision);
@@ -100,7 +99,7 @@ public class LuminolTune {
       params.put("lag_window_size", lag_window_size);
       params.put("future_window_size",future_window_size);
       params.put("threshold", threshold);
-      SingleDimAlgorithm alg = new Luminol();
+      UniDimAlgorithm alg = new Luminol();
       alg.init(params, ts);
       alg.run();
 
@@ -119,7 +118,7 @@ public class LuminolTune {
         }
       }
       pw.close();
-      LOGGER.info("done");
+      System.out.println("done");
 
     } catch (ArgumentParserException e) {
       parser.handleError(e);

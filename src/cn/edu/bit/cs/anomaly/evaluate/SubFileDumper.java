@@ -25,7 +25,7 @@ public class SubFileDumper {
     public String[] pMetricNames = {"precision", "recall", "fmeasure", "accuracy",
             "errorRate", "sensitive", "specificity"};
     public int rMetric = 2;
-    public String[] rMetricNames = {"precision", "recall"};
+    public String[] rMetricNames = {"precision", "recall","fmeasure"};
 
     public void dumpTuneResults(String folderDir, double alpha, POS_BIAS bias) throws IOException {
         // cluster by filename
@@ -51,12 +51,11 @@ public class SubFileDumper {
         // 4. write into file
         for (String rawName : fileMap.keySet()) {
             String dsName = meta.getRawToName().get(rawName);
-
             Map<String, Object> dsMap = meta.getDataset().get(dsName);
             String dir = (String) dsMap.get("dataDir");
             String filePrefix = (String) dsMap.get("rawPrefix");
             assert (filePrefix.equals(rawName));
-            String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+            String rawPath = String.format("%s/valN/%s.csv", dir, filePrefix);
             TimeSeriesMulDim ts = fh.readMulDataWithLabel(rawPath);
             seriesMap.put(rawName, ts);
             if (meta.getSets().contains(dsName)) {
@@ -106,6 +105,7 @@ public class SubFileDumper {
                     rm.computeMetric(alpha, bias, realAnomalyMapSub.get(rawName), predictAnomaly);
                     paramList.add(String.format("%.3f", rm.precision));
                     paramList.add(String.format("%.3f", rm.recall));
+                    paramList.add(String.format("%.3f", rm.fmeasure));
                 }
                 resList.add(String.join(",", paramList));
             } // end of files

@@ -1,6 +1,8 @@
 package cn.edu.bit.cs.anomaly.total.type;
 
+import cn.edu.bit.cs.anomaly.GrammarViz;
 import cn.edu.bit.cs.anomaly.LRRDS;
+import cn.edu.bit.cs.anomaly.Merlin;
 import cn.edu.bit.cs.anomaly.NeighborProfile;
 import cn.edu.bit.cs.anomaly.PBAD;
 import cn.edu.bit.cs.anomaly.SAND;
@@ -12,10 +14,15 @@ import cn.edu.bit.cs.anomaly.total.SubMetaData;
 import cn.edu.bit.cs.anomaly.util.Constants.POS_BIAS;
 import cn.edu.bit.cs.anomaly.util.DataHandler;
 import cn.edu.bit.cs.anomaly.util.FileHandler;
+
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -43,21 +50,22 @@ public class TypeUniSubTest {
     String size = res.getString("size");
     List<Integer> seeds = res.getList("seed");
     MetaData meta = SubMetaData.getInstance();
-    Map<String, Object> dsMap = meta.getDataset().get(dsName);
-    String dir = (String) dsMap.get("dataDir");
-    String filePrefix = (String) dsMap.get("rawPrefix");
-
+    //Map<String, Object> dsMap = meta.getDataset().get(dsName);
+    //String dir = (String) dsMap.get("dataDir");
+    //String filePrefix = (String) dsMap.get("rawPrefix");
+    String dir="syn/sub/uni";
+    String filePrefix="uni";
     FileHandler fh = new FileHandler();
 
-    String[] vars = {"subg","subs","subt"};
-    boolean[] willOperate = {true,true, true, true};
+    String[] vars = {"subs"};
+    boolean[] willOperate = {false,false, false, false,true, false};
 
-    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP"};
-    String[] metricNames = {"precision", "recall"};
+    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP","MERLIN","GrammarViz"};
+    String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
     final int ALGNUM = algNames.length;
-    final int METRICNUM = 2;  // precision, recall
+    final int METRICNUM = 3;  // precision, recall
 
     long[][] algtime = new long[ALGNUM][2];
     long[][] totaltime = new long[VARSIZE][ALGNUM];
@@ -71,20 +79,22 @@ public class TypeUniSubTest {
     LRRDS lrrds = null;
     SAND sand = null;
     NeighborProfile np = null;
-
+    Merlin merlin=null;
+    GrammarViz grammarviz=null;
+    
     double alpha = 0;
     POS_BIAS bias = POS_BIAS.FLAT;
     ArrayList<Range> predictAnomaly = null;
 
     for (int index = 0; index < VARSIZE; ++index) {
       String rawPath =
-          String.format("%s/%s_%s_len_%s_%s_%s_", dir, filePrefix, vars[index], anomalyLength, size,
+          String.format("%s_%s_rate/test/%s_%s_len_%s_%s_%s_", dir, vars[index],filePrefix, vars[index], anomalyLength, size,
               anomalyRate);
       System.out.println("test with " + vars[index] + " on " + rawPath + " begin");
       Map<Integer, ArrayList<Range>> realAnomalyMap = new HashMap<>();
       Map<Integer, TimeSeries> seriesMap = new HashMap<>();
       Map<Integer, TimeSeriesMulDim> seriesMulMap = new HashMap<>();
-
+      dsName="uni_"+vars[index]+"_sp";
       // PBAD
       algIndex = 0;
       if (willOperate[algIndex]) {
@@ -99,16 +109,16 @@ public class TypeUniSubTest {
             timeSeriesMulDim = seriesMulMap.get(seed);
           }
           algtime[algIndex][0] = System.currentTimeMillis();
-          pbad = new PBAD();
+          pbad = new PBAD();      
           Map<String,Object> pbadParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
           pbad.init(pbadParams, timeSeriesMulDim);
           pbad.run();
           algtime[algIndex][1] = System.currentTimeMillis();
           totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
           predictAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
-          String dumpPath = String.format(
+          /*String dumpPath = String.format(
                   "%s/%s_%s_%s_l_%s.csv", "result/type/ids", algNames[algIndex], filePrefix, vars[index], "sub");
-          fh.writeAnomalyRange(predictAnomaly, dumpPath);
+          fh.writeAnomalyRange(predictAnomaly, dumpPath);*/
           DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
               metrics[index][algIndex]);
         }
@@ -138,9 +148,6 @@ public class TypeUniSubTest {
           algtime[algIndex][1] = System.currentTimeMillis();
           totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
           predictAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
-          String dumpPath = String.format(
-                  "%s/%s_%s_%s_l_%s.csv", "result/type/ids", algNames[algIndex], filePrefix, vars[index], "sub");
-          fh.writeAnomalyRange(predictAnomaly, dumpPath);
           DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
               metrics[index][algIndex]);
         }
@@ -168,9 +175,7 @@ public class TypeUniSubTest {
           algtime[algIndex][1] = System.currentTimeMillis();
           totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
           predictAnomaly = DataHandler.findAnomalyRange(timeseries);
-          String dumpPath = String.format(
-                  "%s/%s_%s_%s_l_%s.csv", "result/type/ids", algNames[algIndex], filePrefix, vars[index], "sub");
-              fh.writeAnomalyRange(predictAnomaly, dumpPath);
+
           DataHandler.evaluate(
               alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
         }
@@ -198,17 +203,71 @@ public class TypeUniSubTest {
           algtime[algIndex][1] = System.currentTimeMillis();
           totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
           predictAnomaly = DataHandler.findAnomalyRange(timeseries);
+          DataHandler.evaluate(
+              alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
+        }
+      }
+      // MERLIN
+      algIndex++;
+      if (willOperate[algIndex]) {
+        for (int seed : seeds) {
+          System.out.println(algNames[algIndex] + " begin on seed " + seed);
+          if (!seriesMap.containsKey(seed)) {
+            timeseries = fh.readDataWithLabel(rawPath + seed + ".csv");
+            seriesMap.put(seed, timeseries);
+            if (!realAnomalyMap.containsKey(seed)) {
+              ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeseries);
+              realAnomalyMap.put(seed, realAnomaly);
+            }
+          } else {
+            timeseries = seriesMap.get(seed);
+          }
+          algtime[algIndex][0] = System.currentTimeMillis();
+          merlin = new Merlin();
+          Map<String, Object> merlinParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+          merlin.init(merlinParams, timeseries);
+          merlin.run();
+          algtime[algIndex][1] = System.currentTimeMillis();
+          totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
+          predictAnomaly = DataHandler.findAnomalyRange(timeseries);
           String dumpPath = String.format(
-                  "%s/%s_%s_%s_l_%s.csv", "result/type/ids", algNames[algIndex], filePrefix, vars[index], "sub");
+                  "%s/%s_%s_%s_l_%s.csv", "result/acc/id", algNames[algIndex], filePrefix, vars[index], "sub");
           fh.writeAnomalyRange(predictAnomaly, dumpPath);
           DataHandler.evaluate(
               alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
         }
       }
-
+      
+   // grammar
+      algIndex++;
+      if (willOperate[algIndex]) {
+        for (int seed : seeds) {
+          System.out.println(algNames[algIndex] + " begin on seed " + seed);
+          if (!seriesMap.containsKey(seed)) {
+            timeseries = fh.readDataWithLabel(rawPath + seed + ".csv");
+            seriesMap.put(seed, timeseries);
+            if (!realAnomalyMap.containsKey(seed)) {
+              ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeseries);
+              realAnomalyMap.put(seed, realAnomaly);
+            }
+          } else {
+            timeseries = seriesMap.get(seed);
+          }
+          algtime[algIndex][0] = System.currentTimeMillis();
+          grammarviz = new GrammarViz();
+          Map<String, Object> grammarvizParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+          grammarviz.init(grammarvizParams, timeseries);
+          grammarviz.run();
+          algtime[algIndex][1] = System.currentTimeMillis();
+          totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
+          predictAnomaly = DataHandler.findAnomalyRange(timeseries);
+          DataHandler.evaluate(
+              alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
+        }
+      }
       // write results
-      fh.writeResults(
-          "type", "" + dsName, vars, algNames, metricNames, totaltime, metrics, seeds.size());
+      //fh.writeResults(
+       //   "type", "" + "uni_sub1", vars, algNames, metricNames, totaltime, metrics, seeds.size());
     } // end of rIndex
   }
 }

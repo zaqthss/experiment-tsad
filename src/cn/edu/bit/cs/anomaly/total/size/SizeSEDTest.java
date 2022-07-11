@@ -1,6 +1,8 @@
 package cn.edu.bit.cs.anomaly.total.size;
 
+import cn.edu.bit.cs.anomaly.GrammarViz;
 import cn.edu.bit.cs.anomaly.LRRDS;
+import cn.edu.bit.cs.anomaly.Merlin;
 import cn.edu.bit.cs.anomaly.NeighborProfile;
 import cn.edu.bit.cs.anomaly.PBAD;
 import cn.edu.bit.cs.anomaly.SAND;
@@ -52,11 +54,11 @@ public class SizeSEDTest {
 
     String[] vars = {"5000","10000","20000","40000","80000","100000"};
     //String[] vars = {"10000","20000","40000","80000","100000"};
-    String[] arate= {"0.038","0.038","0.048","0.037","0.033","0.031"};
+    String[] arate= {"0.026","0.019","0.026","0.028","0.027","0.027"};
     //String[] arate={"0.038","0.048","0.037","0.033","0.031"};
-    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP"};
-    boolean[] willOperate = {true, true, true,true};
-    String[] metricNames = {"precision", "recall"};
+    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP","MERLIN","GrammarViz"};
+    boolean[] willOperate = {true, true, true,true,true,true};
+    String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
     final int ALGNUM = algNames.length;
@@ -74,6 +76,8 @@ public class SizeSEDTest {
     LRRDS lrrds = null;
     SAND sand = null;
     NeighborProfile np = null;
+    Merlin merlin=null;
+    GrammarViz grammarviz=null;
 
     double alpha = 0;
     POS_BIAS bias = POS_BIAS.FLAT;
@@ -81,7 +85,7 @@ public class SizeSEDTest {
 
     for (int index = 0; index < VARSIZE; ++index) {
       String rawPath =
-          String.format("%s/%s_%s_%s", dir, filePrefix, vars[index],arate[index]);
+          String.format("%s/test/%s_%s_%s", dir, filePrefix, vars[index],arate[index]);
       System.out.println("test with size " + vars[index] + " on " + rawPath + " begin");
       Map<Integer, ArrayList<Range>> realAnomalyMap = new HashMap<>();
       Map<Integer, TimeSeries> seriesMap = new HashMap<>();
@@ -206,6 +210,66 @@ public class SizeSEDTest {
               alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
         }
       }
+   // MERLIN
+      algIndex++;
+      if (willOperate[algIndex]) {
+        for (int seed : seeds) {
+          System.out.println(algNames[algIndex] + " begin on seed " + seed);
+          if (!seriesMap.containsKey(seed)) {
+            timeseries = fh.readDataWithLabel(rawPath + seed + ".csv");
+            seriesMap.put(seed, timeseries);
+            if (!realAnomalyMap.containsKey(seed)) {
+              ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeseries);
+              realAnomalyMap.put(seed, realAnomaly);
+            }
+          } else {
+            timeseries = seriesMap.get(seed);
+          }
+          algtime[algIndex][0] = System.currentTimeMillis();
+          merlin = new Merlin();
+          Map<String, Object> merlinParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+          int k=(int) (Integer.parseInt(vars[index])*Double.parseDouble(arate[index]))/64;
+          merlinParams.put("top_k", k);
+          merlin.init(merlinParams, timeseries);
+          merlin.run();
+          algtime[algIndex][1] = System.currentTimeMillis();
+          totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
+          predictAnomaly = DataHandler.findAnomalyRange(timeseries);
+          DataHandler.evaluate(
+              alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
+        }
+      }
+      
+      // grammar
+         algIndex++;
+         if (willOperate[algIndex]) {
+           for (int seed : seeds) {
+             System.out.println(algNames[algIndex] + " begin on seed " + seed);
+             if (!seriesMap.containsKey(seed)) {
+               timeseries = fh.readDataWithLabel(rawPath + seed + ".csv");
+               seriesMap.put(seed, timeseries);
+               if (!realAnomalyMap.containsKey(seed)) {
+                 ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeseries);
+                 realAnomalyMap.put(seed, realAnomaly);
+               }
+             } else {
+               timeseries = seriesMap.get(seed);
+             }
+             algtime[algIndex][0] = System.currentTimeMillis();
+             grammarviz = new GrammarViz();
+             Map<String, Object> grammarvizParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+             int k=(int) (Integer.parseInt(vars[index])*Double.parseDouble(arate[index]))/64;
+             grammarvizParams.put("DISCORDS_NUM", k);
+             grammarviz.init(grammarvizParams, timeseries);
+             grammarviz.run();
+             algtime[algIndex][1] = System.currentTimeMillis();
+             totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
+             predictAnomaly = DataHandler.findAnomalyRange(timeseries);
+             DataHandler.evaluate(
+                 alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
+           }
+         }
+
 
       // write results
       fh.writeResults(

@@ -1,6 +1,8 @@
 package cn.edu.bit.cs.anomaly.total.inter;
 
+import cn.edu.bit.cs.anomaly.GrammarViz;
 import cn.edu.bit.cs.anomaly.LRRDS;
+import cn.edu.bit.cs.anomaly.Merlin;
 import cn.edu.bit.cs.anomaly.NeighborProfile;
 import cn.edu.bit.cs.anomaly.PBAD;
 import cn.edu.bit.cs.anomaly.SAND;
@@ -27,17 +29,17 @@ public class UMPerDimSubTest {
 
     // String[] vars = {"exercise", "exathlon", "systhetic w/o correlation"};
     //String[] vars = {"exercise", "exathlon"};
-    String[] vars= {"exercise","mul_ncor_subg","mul_cor_subg"};
-    int[] dims = {3,3,3};
+    String[] vars= {"mul_cor_subg","mul_ncor_subg","exercise", "exathlon"};
+    int[] dims = {3,3,3,19};
     //int[] dims = {3,19};
-    boolean[] willOperate = {true, true, true, true};
+    boolean[] willOperate = {true, true, true, true,true,true};
 
-    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP"};
-    String[] metricNames = {"precision", "recall"};
+    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP","MERLIN","GrammarViz"};
+    String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
     final int ALGNUM = algNames.length;
-    final int METRICNUM = 2;  // precision, recall
+    final int METRICNUM = 3;  // precision, recall
 
     long[][] algtime = new long[ALGNUM][2];
     long[][] totaltime = new long[VARSIZE][ALGNUM];
@@ -51,7 +53,9 @@ public class UMPerDimSubTest {
     LRRDS lrrds = null;
     SAND sand = null;
     NeighborProfile np = null;
-
+    Merlin merlin=null;
+    GrammarViz grammarviz=null;
+    
     double alpha = 0;
     POS_BIAS bias = POS_BIAS.FLAT;
     ArrayList<Range> predictAnomaly = null;
@@ -70,7 +74,7 @@ public class UMPerDimSubTest {
       Map<String, Object> dsMap = meta.getDataset().get(dsName);
       String dir = (String)dsMap.get("dataDir");
       String filePrefix = (String)dsMap.get("rawPrefix");
-      String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+      String rawPath = String.format("%s/test/%s.csv", dir, filePrefix);
 
       // PBAD
       algIndex = 0;
@@ -186,12 +190,75 @@ public class UMPerDimSubTest {
         DataHandler.evaluate(
             alpha, bias, tsArray, realAnomalyMap.get(dsName), metrics[index][algIndex]);
       }
-
+      //merlin
+      algIndex++;
+      if (willOperate[algIndex]) {
+        System.out.println(algNames[algIndex] + " begin");
+        if (seriesMap.containsKey(dsName)) {
+          tsArray = seriesMap.get(dsName);
+        } else if (seriesMulMap.containsKey(dsName)) {
+          tsArray = seriesMulMap.get(dsName).convert();
+        } else {
+          timeSeriesMulDim = fh.readMulDataWithLabel(rawPath);
+          tsArray = timeSeriesMulDim.convert();
+          seriesMulMap.put(dsName, timeSeriesMulDim);
+          ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
+          realAnomalyMap.put(dsName, realAnomaly);
+        }
+        algtime[algIndex][0] = System.currentTimeMillis();
+        merlin = new Merlin();
+        Map<String, Object> npParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+        for (TimeSeries ts : tsArray) {
+        	merlin.init(npParams, ts);
+        	merlin.run();
+        }
+        algtime[algIndex][1] = System.currentTimeMillis();
+        for (int dIndex = 0; dIndex < tsArray.length; ++dIndex) {
+          ArrayList<Range> dimAnomaly = DataHandler.findAnomalyRange(tsArray[dIndex]);
+          String dumpPath = String.format(
+              "%s/%s_%s_dim_%s_%s.csv", dumpDir, algNames[algIndex], filePrefix, dIndex, "sub");
+          fh.writeAnomalyRange(dimAnomaly, dumpPath);
+        }
+        DataHandler.evaluate(
+            alpha, bias, tsArray, realAnomalyMap.get(dsName), metrics[index][algIndex]);
+      }
+    //grammarviz
+      algIndex++;
+      if (willOperate[algIndex]) {
+        System.out.println(algNames[algIndex] + " begin");
+        if (seriesMap.containsKey(dsName)) {
+          tsArray = seriesMap.get(dsName);
+        } else if (seriesMulMap.containsKey(dsName)) {
+          tsArray = seriesMulMap.get(dsName).convert();
+        } else {
+          timeSeriesMulDim = fh.readMulDataWithLabel(rawPath);
+          tsArray = timeSeriesMulDim.convert();
+          seriesMulMap.put(dsName, timeSeriesMulDim);
+          ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
+          realAnomalyMap.put(dsName, realAnomaly);
+        }
+        algtime[algIndex][0] = System.currentTimeMillis();
+        grammarviz = new GrammarViz();
+        Map<String, Object> npParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+        for (TimeSeries ts : tsArray) {
+        	grammarviz.init(npParams, ts);
+        	grammarviz.run();
+        }
+        algtime[algIndex][1] = System.currentTimeMillis();
+        for (int dIndex = 0; dIndex < tsArray.length; ++dIndex) {
+          ArrayList<Range> dimAnomaly = DataHandler.findAnomalyRange(tsArray[dIndex]);
+          String dumpPath = String.format(
+              "%s/%s_%s_dim_%s_%s.csv", dumpDir, algNames[algIndex], filePrefix, dIndex, "sub");
+          fh.writeAnomalyRange(dimAnomaly, dumpPath);
+        }
+        DataHandler.evaluate(
+            alpha, bias, tsArray, realAnomalyMap.get(dsName), metrics[index][algIndex]);
+      }
       for (int algi = 0; algi < ALGNUM; ++algi) {
         totaltime[index][algi] += algtime[algi][1] - algtime[algi][0];
       }
       // write results
-      fh.writeResults("um", "dim-sub1", vars, algNames,
+      fh.writeResults("um", "dim-sub", vars, algNames,
           metricNames, totaltime, metrics, 1);
     } // end of rIndex
   }

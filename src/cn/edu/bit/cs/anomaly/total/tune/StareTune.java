@@ -89,12 +89,12 @@ public class StareTune {
 
       // read file
       String rawPath = String.format("%s/%s.csv", dir, filePrefix);
-      LOGGER.info("loading " + rawPath);
+      System.out.println("loading " + rawPath);
       FileHandler fh = new FileHandler();
       TimeSeriesMulDim ts = fh.readMulDataWithLabel(rawPath);
 
       // run algorithm
-      LOGGER.info("run Stare");
+      System.out.println("run Stare");
       Map<String, Object> params = new HashMap<>();
 
       params.put("R", R);
@@ -110,7 +110,7 @@ public class StareTune {
       alg.run();
 
       // write result
-      LOGGER.info("dumping into " + resultPath);
+      System.out.println("dumping into " + resultPath);
       pw = new PrintWriter(new FileWriter(resultPath));
       if (meta.getSets().contains(dsName) || anomalyType.equals("point")) {
         TreeMap<Long, TimePointMulDim> predictAnomaly = DataHandler.findAnomalyPoint(ts);
@@ -125,7 +125,7 @@ public class StareTune {
         }
       }
       pw.close();
-      LOGGER.info("done");
+      System.out.println("done");
 
     } catch (ArgumentParserException e) {
       parser.handleError(e);

@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Random;
 
 /** @author dsq */
-public class NeighborProfile implements SingleDimAlgorithm {
+public class NeighborProfile implements UniDimAlgorithm {
   public TimeSeries timeseries;
   public ArrayList<TimeSeries> T_List;
   public ArrayList<TimeSeries> Subsample_List;

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public class FileHandler {
 
-  public static String PATH = "data/";
+  public static String PATH = "../data/";
 
   /**
    * Two basic attributes: timestamp, value
@@ -81,9 +81,9 @@ public class FileHandler {
 
       while ((line = br.readLine()) != null) {
         String[] vals = line.split(",");
-        timestamp = Long.parseLong(vals[0]);
+        timestamp = new Double(Double.parseDouble(vals[0])).longValue();
         value = Double.parseDouble(vals[1]);
-        label = Integer.parseInt(vals[2]);
+        label = Math.round(Float.parseFloat(vals[2]));
 
         tp = new TimePoint(timestamp, value);
         if (label == 1) {
@@ -248,12 +248,12 @@ public class FileHandler {
       line = br.readLine(); // header
       while ((line = br.readLine()) != null) {
         String[] vals = line.split(",");
-        timestamp = Long.parseLong(vals[0]);
+        timestamp = new Double(Double.parseDouble(vals[0])).longValue();
         value = new double[dim];
         for (int i = 0; i < dim; i++) {
           value[i] = Double.parseDouble(vals[i + 1]);
         }
-        int label = Integer.parseInt(vals[vals.length - 1]);
+        int label =Math.round(Float.parseFloat(vals[vals.length - 1]));
 
         tp = new TimePointMulDim(timestamp, value, dim);
         if (label == 1) {

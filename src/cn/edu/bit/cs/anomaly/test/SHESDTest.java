@@ -1,7 +1,7 @@
 package cn.edu.bit.cs.anomaly.test;
 
 import cn.edu.bit.cs.anomaly.SHESD;
-import cn.edu.bit.cs.anomaly.SingleDimAlgorithm;
+import cn.edu.bit.cs.anomaly.UniDimAlgorithm;
 import cn.edu.bit.cs.anomaly.entity.TimeSeries;
 import cn.edu.bit.cs.anomaly.util.FileHandler;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ public class SHESDTest {
     double alpha = 0.05;
     double anomsThreshold = 1.0;
 
-    SingleDimAlgorithm alg = new SHESD();
+    UniDimAlgorithm alg = new SHESD();
     HashMap<String,Object> arg = new HashMap<>();
     arg.put("seasonality",seasonality);
     arg.put("maxAnoms",maxAnoms);

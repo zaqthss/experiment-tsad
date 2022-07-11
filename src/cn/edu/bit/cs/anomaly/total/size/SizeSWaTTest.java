@@ -52,11 +52,11 @@ public class SizeSWaTTest {
 
     String[] vars = {"5000","10000","20000","30000","40000","500000"};
     //String[] vars = {"10000","20000","40000","80000","100000"};
-    String[] arate= {"0.278","0.223","0.149","0.112","0.292","0.089"};
+    String[] arate= {"0.067","0.07","0.051","0.125","0.219","0.177"};
     //String[] arate={"0.038","0.048","0.037","0.033","0.031"};
     String[] algNames = {"PBAD", "LRRDS", "SAND", "NP"};
-    boolean[] willOperate = {true, true, true,true};
-    String[] metricNames = {"precision", "recall"};
+    boolean[] willOperate = {true, true, false,false};
+    String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
     final int ALGNUM = algNames.length;
@@ -81,7 +81,7 @@ public class SizeSWaTTest {
 
     for (int index = 0; index < VARSIZE; ++index) {
       String rawPath =
-          String.format("%s/%s_%s_%s", dir, filePrefix, vars[index],arate[index]);
+          String.format("%s/test/%s_%s_%s", dir, filePrefix, vars[index],arate[index]);
       System.out.println("test with size " + vars[index] + " on " + rawPath + " begin");
       Map<Integer, ArrayList<Range>> realAnomalyMap = new HashMap<>();
       Map<Integer, TimeSeries> seriesMap = new HashMap<>();

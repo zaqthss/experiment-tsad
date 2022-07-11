@@ -72,13 +72,13 @@ public class LRRDSTune {
 	        }
 	        
 	     // read file
-	        String rawPath = String.format("%s/%s.csv", dir, filePrefix);
-	        LOGGER.info("loading " + rawPath);
+	        String rawPath = String.format("%s/valN/%s.csv", dir, filePrefix);
+	        System.out.println("loading " + rawPath);
 	        FileHandler fh = new FileHandler();
 	        TimeSeriesMulDim ts = fh.readMulDataWithLabel(rawPath);
 	        
 	     // run algorithm
-	        LOGGER.info("run lrrds: "+compressed_rate+" "+slack+" "+sub_minlength+" ");
+	        System.out.println("run lrrds: "+compressed_rate+" "+slack+" "+sub_minlength+" ");
 	        Map<String,Object> params = new HashMap<>();
 	        params.put("compressed_rate", compressed_rate);
 	        params.put("slack", slack);
@@ -88,9 +88,9 @@ public class LRRDSTune {
 	        lrrds.run();
 	        
 	        // write result
-	        //LOGGER.info("dumping into " + resultPath);
+	        //System.out.println("dumping into " + resultPath);
 	        pw = new PrintWriter(new FileWriter(resultPath));
-	        if (meta.getSets().contains(dsName) || anomalyType.equals("point")) {
+	        if (anomalyType.equals("point")) {
 	          TreeMap<Long, TimePointMulDim> predictAnomaly = DataHandler.findAnomalyPoint(ts);
 	          for (Long timestamp: predictAnomaly.keySet()) {
 	            pw.println(timestamp);
@@ -103,7 +103,7 @@ public class LRRDSTune {
 	          }
 	        }
 	        pw.close();
-	        LOGGER.info("done");
+	        System.out.println("done");
 	    }catch (ArgumentParserException e) {
 	        parser.handleError(e);
 	    } catch (IOException e) {

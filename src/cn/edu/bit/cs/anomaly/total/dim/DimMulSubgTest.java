@@ -57,9 +57,9 @@ public class DimMulSubgTest {
     FileHandler fh = new FileHandler();
 
     String[] vars = DataHandler.transToDims(dims, maxDim);
-    boolean[] willOperate = {true, true, false, false};
-    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP"};
-    String[] metricNames = {"precision", "recall"};
+    boolean[] willOperate = {true, true};
+    String[] algNames = {"PBAD", "LRRDS"};
+    String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
     final int ALGNUM = algNames.length;
@@ -85,7 +85,7 @@ public class DimMulSubgTest {
     // real anomaly range is not affected by dimension, since the label is across all dims
     // the file is read only once, but will be extracted according to the tested dimensions
     for (int index = 0; index < VARSIZE; ++index) {
-      String rawPath = String.format("%s/%s_subg_dim_50_len_50_10000_0.1_", dir, filePrefix);
+      String rawPath = String.format("%s/test/%s_subg_dim_50_len_50_10000_0.1_", dir, filePrefix);
       System.out.println("test with dim " + vars[index] + " on " + rawPath + " begin");
       Map<Integer, ArrayList<Range>> realAnomalyMap = new HashMap<>();
       Map<Integer, TimeSeries[]> seriesMap = new HashMap<>();
@@ -153,80 +153,6 @@ public class DimMulSubgTest {
           predictAnomaly = DataHandler.findAnomalyRange(timeSeriesDim);
           DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
               metrics[index][algIndex]);
-        }
-      }
-      // SAND
-      algIndex++;
-      if (willOperate[algIndex]) {
-        for (int seed : seeds) {
-          System.out.println(algNames[algIndex] + " begin on seed " + seed);
-          if (size.equals("")) {
-            realPath = rawPath;
-          } else {
-            realPath = rawPath + seed;
-          }
-          if (seriesMap.containsKey(seed)) {
-            tsArray = seriesMap.get(seed);
-          } else if (seriesMulMap.containsKey(seed)) {
-            tsArray = seriesMulMap.get(seed).convert();
-            seriesMap.put(seed, tsArray);
-          } else {
-            timeSeriesMulDim = fh.readMulDataWithLabel(realPath + ".csv");
-            tsArray = timeSeriesMulDim.convert();
-            seriesMap.put(seed, tsArray);
-            seriesMulMap.put(seed, timeSeriesMulDim);
-            ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
-            realAnomalyMap.put(seed, realAnomaly);
-          }
-          algtime[algIndex][0] = System.currentTimeMillis();
-          sand = new SAND();
-          Map<String, Object> sandParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
-          for (int dimIndex = 0; dimIndex < currentDim; ++dimIndex) {
-            sand.init(sandParams, tsArray[dimIndex]);
-            sand.run();
-          }
-          algtime[algIndex][1] = System.currentTimeMillis();
-          totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
-          DataHandler.evaluate(
-              alpha, bias, Arrays.copyOfRange(tsArray, 0, currentDim),
-              realAnomalyMap.get(seed), metrics[index][algIndex]);
-        }
-      }
-      // NP
-      algIndex++;
-      if (willOperate[algIndex]) {
-        for (int seed : seeds) {
-          System.out.println(algNames[algIndex] + " begin on seed " + seed);
-          if (size.equals("")) {
-            realPath = rawPath;
-          } else {
-            realPath = rawPath + seed;
-          }
-          if (seriesMap.containsKey(seed)) {
-            tsArray = seriesMap.get(seed);
-          } else if (seriesMulMap.containsKey(seed)) {
-            tsArray = seriesMulMap.get(seed).convert();
-            seriesMap.put(seed, tsArray);
-          } else {
-            timeSeriesMulDim = fh.readMulDataWithLabel(realPath + ".csv");
-            tsArray = timeSeriesMulDim.convert();
-            seriesMap.put(seed, tsArray);
-            seriesMulMap.put(seed, timeSeriesMulDim);
-            ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
-            realAnomalyMap.put(seed, realAnomaly);
-          }
-          algtime[algIndex][0] = System.currentTimeMillis();
-          np = new NeighborProfile();
-          Map<String, Object> npParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
-          for (int dimIndex = 0; dimIndex < currentDim; ++dimIndex) {
-            np.init(npParams, tsArray[dimIndex]);
-            np.run();
-          }
-          algtime[algIndex][1] = System.currentTimeMillis();
-          totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
-          DataHandler.evaluate(
-              alpha, bias, Arrays.copyOfRange(tsArray, 0, currentDim),
-              realAnomalyMap.get(seed), metrics[index][algIndex]);
         }
       }
       // write results

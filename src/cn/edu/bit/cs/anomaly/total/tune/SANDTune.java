@@ -74,13 +74,13 @@ public class SANDTune {
 	        }
 	        
 	     // read file
-	        String rawPath = String.format("%s/%s.csv", dir, filePrefix);
-	        LOGGER.info("loading " + rawPath);
+	        String rawPath = String.format("%s/valN/%s.csv", dir, filePrefix);
+	        System.out.println("loading " + rawPath);
 	        FileHandler fh = new FileHandler();
 	        TimeSeries ts = fh.readDataWithLabel(rawPath);
 	        
 	     // run algorithm
-	        LOGGER.info("run sand"+" "+k+" "+batch_size+" "+pattern_length+" "+top_k);
+	        System.out.println("run sand"+" "+k+" "+batch_size+" "+pattern_length+" "+top_k);
 	        Map<String,Object> params = new HashMap<>();
 	        params.put("k", k);
 	        params.put("batch_size", batch_size);
@@ -91,9 +91,9 @@ public class SANDTune {
 	        sand.run();
 	        
 	        // write result
-	        //LOGGER.info("dumping into " + resultPath);
+	        //System.out.println("dumping into " + resultPath);
 	        pw = new PrintWriter(new FileWriter(resultPath));
-	        if (meta.getSets().contains(dsName) || anomalyType.equals("point")) {
+	        if (anomalyType.equals("point")) {
 	          TreeMap<Long, TimePoint> predictAnomaly = DataHandler.findAnomalyPoint(ts);
 	          for (Long timestamp: predictAnomaly.keySet()) {
 	            pw.println(timestamp);
@@ -106,7 +106,7 @@ public class SANDTune {
 	          }
 	        }
 	        pw.close();
-	        LOGGER.info("done");
+	        System.out.println("done");
 	    }catch (ArgumentParserException e) {
 	        parser.handleError(e);
 	    } catch (IOException e) {

@@ -71,12 +71,12 @@ public class CPODTune {
 */
             // read file
             String rawPath = String.format("%s/%s.csv", dir, filePrefix);
-            LOGGER.info("loading " + rawPath);
+            System.out.println("loading " + rawPath);
             FileHandler fh = new FileHandler();
             TimeSeriesMulDim ts = fh.readMulDataWithLabel(rawPath);
 
             // run algorithm
-            LOGGER.info("run cpod");
+            System.out.println("run cpod");
             Map<String, Object> params = new HashMap<>();
             params.put("mul", mul);
             params.put("sSize", slideSize);
@@ -88,7 +88,7 @@ public class CPODTune {
             cpod.run();
 
             // write result
-            LOGGER.info("dumping into " + resultPath);
+            System.out.println("dumping into " + resultPath);
             pw = new PrintWriter(new FileWriter(resultPath));
             if (meta.getSets().contains(dsName) || anomalyType.equals("point")) {
                 TreeMap<Long, TimePointMulDim> predictAnomaly = DataHandler.findAnomalyPoint(ts);
@@ -103,7 +103,7 @@ public class CPODTune {
                 }
             }
             pw.close();
-            LOGGER.info("done");
+            System.out.println("done");
 
         } catch (ArgumentParserException e) {
             parser.handleError(e);

@@ -1,6 +1,8 @@
 package cn.edu.bit.cs.anomaly.total.acc;
 
+import cn.edu.bit.cs.anomaly.GrammarViz;
 import cn.edu.bit.cs.anomaly.LRRDS;
+import cn.edu.bit.cs.anomaly.Merlin;
 import cn.edu.bit.cs.anomaly.NeighborProfile;
 import cn.edu.bit.cs.anomaly.PBAD;
 import cn.edu.bit.cs.anomaly.SAND;
@@ -13,9 +15,13 @@ import cn.edu.bit.cs.anomaly.util.Constants.POS_BIAS;
 import cn.edu.bit.cs.anomaly.util.DataHandler;
 import cn.edu.bit.cs.anomaly.util.FileHandler;
 
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /** Test accuracy on univariate subsequence anomaly */
 public class UniSubTest {
@@ -23,15 +29,15 @@ public class UniSubTest {
   public static void main(String[] args) throws Exception {
     FileHandler fh = new FileHandler();
 
-    String[] vars = {"sed"};
-    boolean[] willOperate = {false, true, false, false};
+    String[] vars = {"power"};
+    boolean[] willOperate = {false, false, false, false,true,false};
 
-    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP"};
-    String[] metricNames = {"precision", "recall"};
+    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP","MERLIN","GrammarViz"};
+    String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
     final int ALGNUM = algNames.length;
-    final int METRICNUM = 2; // precision, recall
+    final int METRICNUM = 3; // precision, recall,fmeasure
 
     long[][] algtime = new long[ALGNUM][2];
     long[][] totaltime = new long[VARSIZE][ALGNUM];
@@ -45,6 +51,8 @@ public class UniSubTest {
     LRRDS lrrds = null;
     SAND sand = null;
     NeighborProfile np = null;
+    Merlin merlin=null;
+    GrammarViz grammarviz=null;
 
     double alpha = 0;
     POS_BIAS bias = POS_BIAS.FLAT;
@@ -59,7 +67,7 @@ public class UniSubTest {
       Map<String, Object> dsMap = meta.getDataset().get(dsName);
       String dir = (String) dsMap.get("dataDir");
       String filePrefix = (String) dsMap.get("rawPrefix");
-      String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+      String rawPath = String.format("%s/test/%s.csv", dir, filePrefix);
 
       // PBAD
       algIndex = 0;
@@ -156,12 +164,64 @@ public class UniSubTest {
         DataHandler.evaluate(
             alpha, bias, predictAnomaly, realAnomalyMap.get(dsName), metrics[index][algIndex]);
       }
-
+      
+   // MERLIN
+      algIndex++;
+      if (willOperate[algIndex]) {
+        System.out.println(algNames[algIndex] + " begin");
+        if (!seriesMap.containsKey(dsName)) {
+          timeseries = fh.readDataWithLabel(rawPath);
+          seriesMap.put(dsName, timeseries);
+          if (!realAnomalyMap.containsKey(dsName)) {
+            ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeseries);
+            realAnomalyMap.put(dsName, realAnomaly);
+          }
+        } else {
+          timeseries = seriesMap.get(dsName);
+        }
+        algtime[algIndex][0] = System.currentTimeMillis();
+        merlin = new Merlin();
+        Map<String, Object> merlinParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+        merlin.init(merlinParams, timeseries);
+        merlin.run();
+        algtime[algIndex][1] = System.currentTimeMillis();
+        predictAnomaly = DataHandler.findAnomalyRange(timeseries);
+        String dumpPath = String.format(
+                "%s/%s_%s_%s_l_%s.csv", "result/acc/id", algNames[algIndex], filePrefix, vars[index], "sub");
+        fh.writeAnomalyRange(predictAnomaly, dumpPath);
+        DataHandler.evaluate(
+            alpha, bias, predictAnomaly, realAnomalyMap.get(dsName), metrics[index][algIndex]);
+      }
+      
+   // grammar
+      algIndex++;
+      if (willOperate[algIndex]) {
+        System.out.println(algNames[algIndex] + " begin");
+        if (!seriesMap.containsKey(dsName)) {
+          timeseries = fh.readDataWithLabel(rawPath);
+          seriesMap.put(dsName, timeseries);
+          if (!realAnomalyMap.containsKey(dsName)) {
+            ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeseries);
+            realAnomalyMap.put(dsName, realAnomaly);
+          }
+        } else {
+          timeseries = seriesMap.get(dsName);
+        }
+        algtime[algIndex][0] = System.currentTimeMillis();
+        grammarviz = new GrammarViz();
+        Map<String, Object> grammarvizParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+        grammarviz.init(grammarvizParams, timeseries);
+        grammarviz.run();
+        algtime[algIndex][1] = System.currentTimeMillis();
+        predictAnomaly = DataHandler.findAnomalyRange(timeseries);
+        DataHandler.evaluate(
+            alpha, bias, predictAnomaly, realAnomalyMap.get(dsName), metrics[index][algIndex]);
+      }
       for (int algi = 0; algi < ALGNUM; ++algi) {
         totaltime[index][algi] += algtime[algi][1] - algtime[algi][0];
       }
       // write results
-      fh.writeResults("acc", "uni-sub-", vars, algNames, metricNames, totaltime, metrics, 1);
+      //fh.writeResults("acc", "uni-sub-", vars, algNames, metricNames, totaltime, metrics, 1);
     } // end of rIndex
   }
 }

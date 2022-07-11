@@ -27,7 +27,7 @@ public class UniPointTest {
 
 //    String[] vars = {"YahooA1", "stock_10k_point", "uni_point"};
     String[] vars = {"yahoo","twitter"};
-    boolean[] willOperate = {true, true, true, true, true};
+    boolean[] willOperate = {true, true, true, false, true};
 
     String[] algNames = {"CPOD", "NETS", "Stare", "Luminol", "SHESD"};
     String[] metricNames = {"precision", "recall", "fmeasure"};
@@ -60,7 +60,7 @@ public class UniPointTest {
       Map<String, Object> dsMap = meta.getDataset().get(dsName);
       String dir = (String) dsMap.get("dataDir");
       String filePrefix = (String) dsMap.get("rawPrefix");
-      String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+      String rawPath = String.format("%s/%s/%s.csv", dir,"test", filePrefix);
 
       // CPOD
       algIndex = 0;

@@ -8,7 +8,6 @@ import cn.edu.bit.cs.anomaly.util.SHESD.statistics.OnlineNormalStatistics;
 import cn.edu.bit.cs.anomaly.util.SHESD.statistics.QuickMedians;
 import cn.edu.bit.cs.anomaly.util.SHESD.stl.STLDecomposition;
 import cn.edu.bit.cs.anomaly.util.SHESD.stl.STLResult;
-import edu.stanford.nlp.util.ArrayUtils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
@@ -19,7 +18,7 @@ import org.apache.commons.math3.distribution.TDistribution;
  * Implementation of the underlying algorithm – referred to as Seasonal Hybrid ESD (S-H-ESD) builds
  * upon the Generalized ESD test for detecting anomalies. Created by on 16-4-6.
  */
-public class SHESD implements SingleDimAlgorithm {
+public class SHESD implements UniDimAlgorithm {
 
   private Config config;
   private TimeSeries timeseries;

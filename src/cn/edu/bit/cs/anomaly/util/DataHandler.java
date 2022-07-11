@@ -302,6 +302,7 @@ public class DataHandler {
     rm.computeMetric(alpha, bias, realAnomaly, predictAnomaly);
     metrics[0] += rm.precision;
     metrics[1] += rm.recall;
+    metrics[2] += rm.fmeasure;
   }
 
   // mul range to uni alg
@@ -318,6 +319,7 @@ public class DataHandler {
     rm.computeMetric(alpha, bias, realAnomaly, predictAnomalyRangeCombine);
     metrics[0] += rm.precision;
     metrics[1] += rm.recall;
+    metrics[2] += rm.fmeasure;
   }
   
   //mul range to mul alg
@@ -334,6 +336,7 @@ public class DataHandler {
 	    rm.computeMetric(alpha, bias, realAnomaly, predictAnomalyRangeCombine);
 	    metrics[0] += rm.precision;
 	    metrics[1] += rm.recall;
+	    metrics[2] += rm.fmeasure;
   }
   
   public static String[] transToDims(List<Integer> dimList, int maxDim) {

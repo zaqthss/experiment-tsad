@@ -4,8 +4,6 @@ import cn.edu.bit.cs.anomaly.util.Constants.IS_ANOMALY;
 import cn.edu.bit.cs.anomaly.util.NETS.Cell;
 import cn.edu.bit.cs.anomaly.util.NETS.NETSStreamGenerator;
 import cn.edu.bit.cs.anomaly.util.NETS.Tuple;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

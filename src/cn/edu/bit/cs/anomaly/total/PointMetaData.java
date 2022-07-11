@@ -33,171 +33,123 @@ public class PointMetaData implements MetaData{
 
   public Map<String, Map<String, Object>> dataset =
       new HashMap<String, Map<String, Object>>() {
-        {
-          // _point_context_10000_0.1_1
+        {put(
+            "tao",
+            new HashMap<String, Object>() {
+              {
+                put("dataDir", "Point\\mul\\Tao");
+                put("tdir","train");
+                put("tedir","test");
+                put("vdir","valid");
+                put("rawPrefix", "tao");
+                put("dim", 3);
+              }
+            });
+          put(
+              "mul",
+              new HashMap<String, Object>() {
+                {
+                  put("dataDir", "Point\\mul\\Mul");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "Mul");
+                  put("dim", 32);
+                }
+              });
          put(
               "smtp",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "point");
+                  put("dataDir", "Point\\mul\\SMTP");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
                   put("rawPrefix", "SMTP");
                   put("dim", 3);
                 }
               });
           put(
-              "tao",
+              "smtp_10k_num_13",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "syn");
-                  put("rawPrefix", "tao_pointc_100000_0.1_1");
+                  put("dataDir", "Point\\mul\\SMTP");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "SMTP");
                   put("dim", 3);
                 }
               });
-
-          // 4.3.2
           put(
-              "stock_100k_point",
+              "pen",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "syn");
-                  put("rawPrefix", "stock_pointc_100000_0.1_1");
-                  put("dim", 1);
-                }
-              });
-          //Cui part
-          put(
-              "uni_100",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/uni");
-                  put("rawPrefix", "uni_pointg_1000_0.1_1");
-                  put("dim", 1);
+                  put("dataDir", "Point\\mul\\Pen");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "Pen");
+                  put("dim", 16);
                 }
               });
           put(
-              "uni_0.1",
+              "ecg",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "cui/uni");
-                  put("rawPrefix", "uni_pointg_10000_0.1_1");
-                  put("dim", 1);
+                  put("dataDir", "Point\\mul\\ECG");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "ECG");
+                  put("dim", 32);
                 }
               });
           put(
-              "uni_0.3",
+              "ecg_5k_num_765",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "cui/uni");
-                  put("rawPrefix", "uni_pointg_10000_0.3_1");
-                  put("dim", 1);
+                  put("dataDir", "Point\\mul\\ECG");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "ecg_5k_num_765");
+                  put("dim", 32);
                 }
               });
           put(
-              "uni_0.05",
+              "credit",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "cui/uni");
-                  put("rawPrefix", "uni_pointg_10000_0.05_1");
-                  put("dim", 1);
+                  put("dataDir", "Point\\mul\\credit");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "credit");
+                  put("dim", 28);
                 }
               });
           put(
-              "uni_all",
+              "credit_5k_num_35",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "cui/uni");
-                  put("rawPrefix", "uni");
-                  put("dim", 1);
+                  put("dataDir", "Point\\mul\\credit");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "credit_5k_num_35");
+                  put("dim", 28);
                 }
               });
           put(
-              "stock_0.1",
+              "stock",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "cui/uni");
-                  put("rawPrefix", "stock_pointg_10000_0.1_1");
-                  put("dim", 1);
-                }
-              });
-          put(
-              "stock_0.1_tc",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/uni");
-                  put("rawPrefix", "stock_pointc_10000_0.1_2");
-                  put("dim", 1);
-                }
-              });
-          put(
-              "stock_0.3",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/uni");
-                  put("rawPrefix", "stock_pointg_10000_0.3_1");
-                  put("dim", 1);
-                }
-              });
-          put(
-              "stock_all",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/uni");
+                  put("dataDir", "Point\\uni\\stock");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
                   put("rawPrefix", "stock");
-                  put("dim", 1);
-                }
-              });
-          put(
-              "mul_0.1",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "mul_pointg_10000_0.1_1");
-                  put("dim", 32);
-                }
-              });
-          put(
-              "mul_all",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "mul");
-                  put("dim", 32);
-                }
-              });
-          put(
-              "tao_0.1",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "tao_pointg_1000_0.1_1");
-                  put("dim", 3);
-                }
-              });
-          put(
-              "tao_5000_0.1",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "tao_pointg_5000_0.1_1");
-                  put("dim", 3);
-                }
-              });
-          put(
-              "tao_all",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "tao");
-                  put("dim", 3);
-                }
-              });
-          //Single Datasets
-          put(
-              "yahoo",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/uni");
-                  put("rawPrefix", "yahoo");
                   put("dim", 1);
                 }
               });
@@ -205,117 +157,95 @@ public class PointMetaData implements MetaData{
               "twitter",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "cui/uni");
+                  put("dataDir", "Point\\uni\\twitter");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
                   put("rawPrefix", "twitter");
                   put("dim", 1);
                 }
               });
           put(
-              "smtp_10k",
+              "uni",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "SMTP_10k_num_13");
-                  put("dim", 3);
+                  put("dataDir", "Point\\uni\\Uni");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "uni");
+                  put("dim", 1);
                 }
               });
           put(
-              "smtp",
+              "yahoo",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "SMTP");
-                  put("dim", 3);
-                }
-              });
-
-          put(
-              "credit_5k",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "credit_5k_num_35");
-                  put("dim", 28);
-                }
-              });
-          put(
-              "credit",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "credit");
-                  put("dim", 28);
-                }
-              });
-          put(
-              "ecg_5k",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "ECG_5k_num_765");
-                  put("dim", 32);
-                }
-              });
-          put(
-              "ecg",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "ECG");
-                  put("dim", 32);
-                }
-              });
-          put(
-              "pen",
-              new HashMap<String, Object>() {
-                {
-                  put("dataDir", "cui/mul");
-                  put("rawPrefix", "pen");
-                  put("dim", 16);
+                  put("dataDir", "Point\\uni\\Yahoo");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "Yahoo");
+                  put("dim", 1);
                 }
               });
           put(
               "dlr",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "cui/mul");
+                  put("dataDir", "Point\\mul\\dlr");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
                   put("rawPrefix", "dlr");
-                  put("dim", 9);
+                  put("dim", 3);
                 }
               });
           put(
-              "uni_subs_sp",
+              "exathlon_sp_pos",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "syn/sub");
-                  put("rawPrefix", "uni_subs_len_50_5000_0.1_1");
+                  put("dataDir", "Point\\other\\exathlon_sp_pos");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "exathlon_sp_pos");
                   put("dim", 1);
                 }
               });
           put(
-              "uni_subg_sp",
+              "uni_subg_sp_pos",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "syn/sub");
-                  put("rawPrefix", "uni_subg_len_50_5000_0.1_1");
+                  put("dataDir", "Point\\other\\uni_subg_sp_pos");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "uni_subg_sp_pos");
                   put("dim", 1);
                 }
               });
           put(
-              "uni_subt_sp",
+              "uni_subs_sp_pos",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "syn/sub");
-                  put("rawPrefix", "uni_subt_len_50_5000_0.1_1");
+                  put("dataDir", "Point\\other\\uni_subs_sp_pos");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "uni_subs_sp_pos");
                   put("dim", 1);
                 }
               });
           put(
-              "exathlon_sp",
+              "uni_subt_sp_pos",
               new HashMap<String, Object>() {
                 {
-                  put("dataDir", "syn");
-                  put("rawPrefix", "exathlon_dim1");
+                  put("dataDir", "Point\\other\\uni_subt_sp_pos");
+                  put("tdir","train");
+                  put("tedir","test");
+                  put("vdir","valid");
+                  put("rawPrefix", "uni_subt_sp_pos");
                   put("dim", 1);
                 }
               });
@@ -513,7 +443,7 @@ public class PointMetaData implements MetaData{
                 }
               });
           put(
-              "uni_all",
+              "uni",
               new HashMap<String, Map<String, Object>>() {
                 {
                   put(
@@ -575,7 +505,7 @@ public class PointMetaData implements MetaData{
                 }
               });
           put(
-              "stock_all",
+              "stock",
               new HashMap<String, Map<String, Object>>() {
                 {
                   put(
@@ -764,7 +694,7 @@ public class PointMetaData implements MetaData{
                 }
               });
           put(
-              "mul_all",
+              "mul",
               new HashMap<String, Map<String, Object>>() {
                 {
                   put(
@@ -827,7 +757,7 @@ public class PointMetaData implements MetaData{
                 }
               });
           put(
-              "tao_all",
+              "tao",
               new HashMap<String, Map<String, Object>>() {
                 {
                   put(
@@ -890,7 +820,7 @@ public class PointMetaData implements MetaData{
                 }
               });
           put(
-              "exathlon_sp",
+              "exathlon_sp_pos",
               new HashMap<String, Map<String, Object>>() {
                 {
                   put(
@@ -942,7 +872,7 @@ public class PointMetaData implements MetaData{
                 }
               });
           put(
-              "uni_subg_sp",
+              "uni_subg_sp_pos",
               new HashMap<String, Map<String, Object>>() {
                 {
                   put(
@@ -994,7 +924,59 @@ public class PointMetaData implements MetaData{
                 }
               });
           put(
-              "uni_subs_sp",
+              "uni_subs_sp_pos",
+              new HashMap<String, Map<String, Object>>() {
+                {
+                  put(
+                      "CPOD",
+                      new HashMap<String, Object>() {
+                        {
+                          put("mul", 10);
+                          put("sSize", 5);
+                          put("R", 1.2);
+                          put("K", 15);
+                        }
+                      });
+                  put(
+                      "NETS",
+                      new HashMap<String, Object>() {
+                        {
+                          put("R", 1.2);
+                          put("K", 20);
+                          put("S", 5);
+                          put("W", 50);
+                          put("subDim",1);
+                          put("nW",10000);
+                        }
+                      });
+                  put(
+                      "Stare",
+                      new HashMap<String, Object>() {
+                        {
+                          put("R", 2.);
+                          put("K", 100);
+                          put("S", 2);
+                          put("W", 50);
+                          put("rate", 0.05);
+                          put("skipThred", 0.15);
+                          put("nW", 10000);
+                        }
+                      });
+                  put(
+                      "SHESD",
+                      new HashMap<String, Object>() {
+                        {
+                          put("seasonality", 50);
+                          put("maxAnoms", 0.15);
+                          put("alpha", 0.2);
+                          put("anomsThreshold", 0.7);
+                        }
+                      });
+
+                }
+              });
+          put(
+              "uni_subt_sp_pos",
               new HashMap<String, Map<String, Object>>() {
                 {
                   put(
@@ -1176,43 +1158,7 @@ public class PointMetaData implements MetaData{
       };
 
   public Set<String> pointSets =
-      new HashSet<>(
-          Arrays.asList(
-              "stock_10k_point",
-              "uni_point",
-              "credit_5k",
-              "ecg_5k",
-              "smtp",
-              "smtp_10k",
-              "tao",
-              "tao_10k",
-              //Proformance
-              "http",
-              "ecg",
-              "yahoo",
-              "credit",
-              "pen",
-              "dlr",
-              "twitter",
-              //Experiment
-              "stock_all",
-              "stock_0.3",
-              "stock_0.1",
-              "uni_all",
-              "uni_0.1",
-              "uni_0.3",
-              "uni_0.05",
-              "uni_100",
-              "tao_all",
-              "tao_0.1",
-              "mul_all",
-              "mul_0.1",
-              "uni_subs_sp",
-              "uni_subg_sp",
-              "uni_subt_sp",
-              "exathlon_sp",
-              "tao_5000_0.1",
-              "stock_0.1_tc"));
+      new HashSet<String>(dataset.keySet());
 
   public Map<String, String> rawToName = new HashMap<>();
 
