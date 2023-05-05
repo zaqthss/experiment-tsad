@@ -1,0 +1,2 @@
+lr,beta,n_latent,epoch,dsName,precision,recall,fmeasure
+0.01,0.01,8,5,smtp,Error,Error,Error

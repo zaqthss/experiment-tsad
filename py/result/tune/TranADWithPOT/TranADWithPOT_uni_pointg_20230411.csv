@@ -1,0 +1,10 @@
+lr,batch,n_window,epoch,dsName,precision,recall,fmeasure
+0.1,128,10,5,uni_pointg,Error,Error,Error
+0.1,128,10,5,uni_pointg,Error,Error,Error
+0.1,128,10,5,uni_pointg,Error,Error,Error
+0.1,128,10,5,uni_pointg,Error,Error,Error
+0.1,128,10,5,0.999,uni_pointg,Error,Error,Error
+0.1,128,10,5,"(0.999, 1)",uni_pointg,Error,Error,Error
+0.1,128,10,5,"(0.999, 1)",uni_pointg,0.1111111111111111,0.002002002002002002,0.003933136676499509
+0.1,128,10,5,"(0.999, 1)",uni_pointg,0.1111111111111111,0.002002002002002002,0.003933136676499509
+0.1,128,10,5,"(0.999, 1)",uni_pointg,0.1111111111111111,0.002002002002002002,0.003933136676499509

@@ -1,0 +1,9 @@
+lr,n_latent,n_window,epoch,precision,recall,fmeasure
+0.01,5,5,5,Error,Error,Error
+0.01,5,5,5,Error,Error,Error
+0.01,5,5,10,Error,Error,Error
+0.01,5,5,50,Error,Error,Error
+0.01,5,5,100,Error,Error,Error
+0.01,5,5,200,Error,Error,Error
+0.01,5,5,400,Error,Error,Error
+0.01,5,5,800,Error,Error,Error

@@ -1,0 +1,5 @@
+S,delta,batch_size,freq_warmup,sin_warmup,epoch,dsName,precision,recall,fmeasure
+5,0.05,180,10,10,5,mul_pointg,Error,Error,Error
+5,0.05,180,10,10,5,mul_pointg,Error,Error,Error
+5,0.05,180,10,10,5,mul_pointg,Error,Error,Error
+5,0.05,180,10,10,5,mul_pointg,0.9560906515580736,0.7071129707112971,0.8129661237390383
