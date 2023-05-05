@@ -23,6 +23,8 @@ public class SingleMetric {
     public double sensitive;
     public double specificity;
     public double fmeasure;
+    public double fpr;
+    public double fnr;
 
     public double[] computeMetric(
             TreeMap<Long, TimePoint> realAnomaly,
@@ -64,8 +66,10 @@ public class SingleMetric {
         recall = 1.0 * TP / (TP + FN);
         errorRate = 1.0 * (FP + FN) / (TP + TN + FP + FN);
         fmeasure = 2 * precision * recall / (precision + recall);
+        fpr=1.0 * FP/(FP+TN);
+        fnr=1.0 * FN/(FN+TP);
 
-        double[] metrics = new double[7];
+        double[] metrics = new double[9];
         metrics[0] = precision;
         metrics[1] = recall;
         metrics[2] = fmeasure;
@@ -73,6 +77,8 @@ public class SingleMetric {
         metrics[4] = errorRate;
         metrics[5] = sensitive;
         metrics[6] = specificity;
+        metrics[7] =fpr;
+        metrics[8]=fnr;
 
         return metrics;
     }

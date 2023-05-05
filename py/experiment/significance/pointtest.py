@@ -5,9 +5,9 @@
 #         Pierre-Alain Muller <pierre-alain.muller@uha.fr>
 # License: GPL3
 
+import matplotlib
 import numpy as np
 import pandas as pd
-import matplotlib
 
 matplotlib.use('agg')
 import matplotlib.pyplot as plt

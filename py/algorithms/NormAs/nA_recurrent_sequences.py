@@ -14,7 +14,9 @@
 import numpy as np
 import pandas as pd
 from scipy import signal
+
 from .tools import get_sequence_under_threshold
+
 
 ###################################################################################################
 ################################# EXTRATION SEQUENCE FUNCTION ####################################
@@ -31,7 +33,7 @@ def _unshift_series(ts, sequence_rec,normalmodel_size):
     return result
 
 def extract_recurrent_sequences_random(ts, normalmodel_size,
-                                       percentage_sel = 0.2, overlapping_factor=1, sampling_division=5):
+                                       percentage_sel = 0.2, overlapping_factor=1, sampling_division=2):
     """
         INPUT
             ts: a list representing the time series

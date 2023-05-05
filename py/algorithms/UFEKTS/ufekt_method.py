@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import random
+
 import numpy as np
 import pandas as pd
-import random
 import tensorly as tl
 from sklearn.neighbors import NearestNeighbors
 from tensorly.decomposition import tucker

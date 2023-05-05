@@ -55,7 +55,7 @@ public class FileDumper {
             String dir = (String) dsMap.get("dataDir");
             String filePrefix = (String) dsMap.get("rawPrefix");
             assert (filePrefix.equals(rawName));
-            String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+            String rawPath = String.format("%s/test/%s.csv", dir, filePrefix);
             TimeSeriesMulDim ts = fh.readMulDataWithLabel(rawPath);
             seriesMap.put(rawName, ts);
             if (meta.getSets().contains(dsName)) {

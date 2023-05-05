@@ -1,11 +1,10 @@
 import os
-
-import instanceFactory as fact
-import tools.fileHandler as fh
-import metaData as meta
-from tools.metricsHandler import pointMetrics
 import time
-import algorithms
+
+from algorithms.algorithm import MachineLearningAlgorithm
+import instanceFactory as fact
+import metaData as meta
+import tools.fileHandler as fh
 
 dsName = "mul_subg_dim"
 algNames = ["BeatGAN"]
@@ -33,7 +32,7 @@ def runtest(fname,dim):
                 os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
                              meta.dataSetsParameters.get(dsName).get("tedir"),
                              "_".join([meta.dataSetsParameters.get(dsName).get("prefix"), 'dim','50','len',len,size, rate, seed])))
-            if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
+            if isinstance(inst, MachineLearningAlgorithm):
                 if meta.dataSetsParameters.get(dsName).get("tdir") is None:
                     raise IOError("Training file is needed")
                 trainingSeries = fh.readMulDataWithLabel(
@@ -45,7 +44,7 @@ def runtest(fname,dim):
                 os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
                              meta.dataSetsParameters.get(dsName).get("tedir"),
                              dsName))
-            if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
+            if isinstance(inst, MachineLearningAlgorithm):
                 if meta.dataSetsParameters.get(dsName).get("tdir") is None:
                     raise IOError("Training file is needed")
                 trainingSeries = fh.readMulDataWithLabel(
@@ -64,7 +63,7 @@ def runtest(fname,dim):
                 algMetrics[algName] = tm
             start = time.time()
             subs = series.getsubdim(dim)
-            if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
+            if isinstance(inst, MachineLearningAlgorithm):
                 tsub = trainingSeries.getsubdim(dim)
                 inst.init(args, subs, tsub)
             else:
@@ -120,7 +119,7 @@ for dim in dims:
                             algMetrics[algName] = tm
                         start = time.time()
                         subs = series.getsubdim(dim)
-                        '''if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
+                        '''if isinstance(inst, MachineLearningAlgorithm):
                             tsub = trainingSeries.getsubdim(dim)
                             inst.init(args, subs, tsub)
                         else:

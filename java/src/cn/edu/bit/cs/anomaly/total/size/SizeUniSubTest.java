@@ -1,11 +1,6 @@
 package cn.edu.bit.cs.anomaly.total.size;
 
-import cn.edu.bit.cs.anomaly.GrammarViz;
-import cn.edu.bit.cs.anomaly.LRRDS;
-import cn.edu.bit.cs.anomaly.Merlin;
-import cn.edu.bit.cs.anomaly.NeighborProfile;
-import cn.edu.bit.cs.anomaly.PBAD;
-import cn.edu.bit.cs.anomaly.SAND;
+import cn.edu.bit.cs.anomaly.*;
 import cn.edu.bit.cs.anomaly.entity.Range;
 import cn.edu.bit.cs.anomaly.entity.TimeSeries;
 import cn.edu.bit.cs.anomaly.entity.TimeSeriesMulDim;
@@ -53,8 +48,8 @@ public class SizeUniSubTest {
     FileHandler fh = new FileHandler();
  
     String[] vars = {"1000","2000","5000","10000", "20000","50000","10000"};
-    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP","Merlin","GrammarViz"};
-    boolean[] willOperate = {false, true, false, false,false,false};
+    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP","MERLIN","GrammarViz","IDK"};
+    boolean[] willOperate = {false, false, false, false,false,false,true};
     String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
@@ -75,6 +70,7 @@ public class SizeUniSubTest {
     NeighborProfile np = null;
     Merlin merlin=null;
     GrammarViz grammarviz=null;
+    IDK idk=null;
 
     double alpha = 0;
     POS_BIAS bias = POS_BIAS.FLAT;
@@ -284,12 +280,43 @@ public class SizeUniSubTest {
                  alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
            }
          }
-
+// IDK
+      algIndex++;
+      if (willOperate[algIndex]) {
+        for (int seed : seeds) {
+          System.out.println(algNames[algIndex] + " begin on seed " + seed);
+          if (!seriesMap.containsKey(seed)) {
+            timeseries = fh.readDataWithLabel(rawPath + seed + ".csv");
+            seriesMap.put(seed, timeseries);
+            if (!realAnomalyMap.containsKey(seed)) {
+              ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeseries);
+              realAnomalyMap.put(seed, realAnomaly);
+            }
+          } else {
+            timeseries = seriesMap.get(seed);
+          }
+          algtime[algIndex][0] = System.currentTimeMillis();
+          idk = new IDK();
+          Map<String, Object> idkParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+          int k=(int) (Integer.parseInt(vars[index])*Double.parseDouble(anomalyRate))/50;
+          idkParams.put("top_k", k);
+          idk.init(idkParams, timeseries);
+          idk.run();
+          algtime[algIndex][1] = System.currentTimeMillis();
+          totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
+          predictAnomaly = DataHandler.findAnomalyRange(timeseries);
+          String dumpPath = String.format(
+                  "%s/%s_%s_%s_%s.csv", "../middle/rate", algNames[algIndex], dsName, vars[index],seed);
+          fh.writeAnomalyRange(predictAnomaly, dumpPath);
+          DataHandler.evaluate(
+                  alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
+        }
+      }
 
 
       // write results
       fh.writeResults(
-          "size", "uni-sub-" + anomalyType,vars, algNames, metricNames, totaltime, metrics, seeds.size());
+          "size", "uni-sub1-" + anomalyType,vars, algNames, metricNames, totaltime, metrics, seeds.size());
     } // end of rIndex
   }
 }

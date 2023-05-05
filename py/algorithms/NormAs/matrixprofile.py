@@ -1,5 +1,7 @@
-import numpy as np
 import math
+
+import numpy as np
+
 
 def is_similarity_join(ts_a, ts_b):
     """

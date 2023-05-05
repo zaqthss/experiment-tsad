@@ -21,14 +21,14 @@ public class SANDTest {
   public static void main(String[] args) {
     TimeSeries T = null;
     //FileHandler fh = new FileHandler();
-    T = readData("sub/taxi.csv");
+    T = readData("test/uni_subg_sp.csv");
     System.out.println("Timeseries length: " + T.getLength());
     // SAND sand=new SAND(T,init_length,batch_size,pattern_length);
     Map<String, Object> arg_list = new HashMap<String, Object>();
     arg_list.put("k", 6);
     arg_list.put("batch_size", 5000);
-    arg_list.put("pattern_length", 150);
-    arg_list.put("top_k", 9);
+    arg_list.put("pattern_length", 55);
+    arg_list.put("top_k", 2);
     long startTime =  System.currentTimeMillis();
     SAND sand = new SAND();
     sand.init(arg_list, T);
@@ -37,7 +37,7 @@ public class SANDTest {
     long usedTime = (endTime-startTime)/1000;
     System.out.println(usedTime);
   }
-  public static String PATH = "data/";
+  public static String PATH = "../data/";
   /**
    * Two basic attributes: timestamp, value
    *

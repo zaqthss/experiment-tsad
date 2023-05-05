@@ -1,24 +1,25 @@
-import instanceFactory as fact
-import tools.fileHandler as fh
-import tools.dataHandler as dh
 from itertools import product
 
-dsName = "mul_ncor_subg_len_50_5000_0.1_1"
-dsDir = "syn/sub/mul_ncor_subg"
+import instanceFactory as fact
+import tools.dataHandler as dh
+import tools.fileHandler as fh
+
+dsName = "uni_subg_sp"
+dsDir = "syn/sub/uni_subg_sp"
 algName = "BeatGAN"
 middleoutDir="middle"
 metricType = "subsequence"
 metricNames = ["precision", "recall","fmeasure"]
 outDir = "tune"
 args = {"lr": [0.01],
-        "seq_len":[64],
+        "seq_len":[32,64],
         "hidden_size":[100],
         "rep_size":[20,50],
         "batch_size":[64],
         "max_epoch":[10],
         "lambdaa":[0.1,1,0.01],
         "network":['CNN'],
-        "top_k":[10,11,12]
+        "top_k":[8,9,10,12,15,20]
         }
 algMetrics = {}
 totalMetrics = {}
@@ -28,7 +29,7 @@ def dictProduct(inp):
     return (dict(zip(inp.keys(), values)) for values in product(*inp.values()))
 
 inst = fact.getAlgInstance(algName)
-oseries = fh.readMulDataWithLabel(dsDir + "/" +"test/" + dsName)
+oseries = fh.readMulDataWithLabel(dsDir + "/" +"test/" + dsName+"_1")
 tseries = fh.readMulDataWithLabel(dsDir + "/" +"train/" + dsName)
 if inst:
     for arg in dictProduct(args):

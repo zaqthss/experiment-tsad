@@ -1,12 +1,11 @@
 import os
-
-import algorithms.algorithm
-import instanceFactory as fact
-import tools.fileHandler as fh
-import metaData as meta
-from tools.metricsHandler import pointMetrics
 import time
+
+import instanceFactory as fact
+import metaData as meta
 import tools.dataHandler as dh
+import tools.fileHandler as fh
+
 algNames = ["BeatGAN"]
 metricType = "subsequence"
 metricNames = ["precision", "recall", "fmeasure"]

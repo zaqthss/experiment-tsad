@@ -1,13 +1,15 @@
 import os
-import tools.dataHandler as dh
-import algorithms.algorithm
-import instanceFactory as fact
-import tools.fileHandler as fh
-import metaData as meta
-from tools.metricsHandler import pointMetrics
 import time
-dsNames=["uni_subt_sp"]
-algNames = ["NormA"]
+import traceback
+
+import instanceFactory as fact
+import metaData as meta
+import tools.dataHandler as dh
+import tools.fileHandler as fh
+from algorithms.algorithm import MachineLearningAlgorithm
+
+dsNames=["uni_subg_sp"]
+algNames = ["TranAD", "USAD", "GDN", "OmniAnomaly"]
 metricType = "subsequence"
 outDir = "length"
 metricNames = ["precision", "recall", "fmeasure"]
@@ -17,6 +19,10 @@ algMetrics = {}
 totalMetrics = {}
 writeMiddleResult = True
 middleoutDir='sp'
+
+training_series = None
+hastrained = []
+instance = {}
 
 def addtodict2(thedict, key_a, key_b, val):
     if key_a in thedict:
@@ -47,7 +53,7 @@ for dsName in dsNames:
                             algMetrics[algName] = tm
                         start = time.time()
                         inst.init(normaargs, series.copy())
-                        rseries = inst.run()
+                        rseries,_ = inst.run()
                         algMetrics[algName]["time"] = float(algMetrics[algName].get("time")) + time.time() - start
                         if writeMiddleResult:
                             predictAnomaly = dh.getAnomalySequences(rseries)
@@ -88,6 +94,84 @@ for dsName in dsNames:
                         mtools.init(series, rseries)
                         for mn in metricNames:
                             algMetrics[algName][mn] = algMetrics[algName][mn] + getattr(mtools, mn, None)()
+
+                else:
+                    if instance.get(algName):
+                        inst = instance.get(algName)
+                    else:
+                        inst = fact.getAlgInstance(algName)
+                        instance[algName] = inst
+                    args = meta.algorithmsParameters.get(algName).get(dsName)
+                    print(args)
+                    print(os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                     meta.dataSetsParameters.get(dsName).get("tedir"),
+                                     meta.dataSetsParameters.get(dsName).get("prefix")))
+                    print(os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                             meta.dataSetsParameters.get(dsName).get("tdir"),
+                                             meta.dataSetsParameters.get(dsName).get("prefix")))
+                    print(os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                             meta.dataSetsParameters.get(dsName).get("vdir"),
+                                             meta.dataSetsParameters.get(dsName).get("prefix")))
+
+                    test_series = fh.readMulDataWithLabel(
+                        os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                     meta.dataSetsParameters.get(dsName).get("tedir"),
+                                     meta.dataSetsParameters.get(dsName).get("prefix")+"_"+seed))
+                    if isinstance(inst, MachineLearningAlgorithm):
+                        if not training_series:
+                            if meta.dataSetsParameters.get(dsName).get("tdir") is None:
+                                raise IOError("Trining file is needed")
+                            training_series = fh.readMulDataWithLabel(
+                                os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                             meta.dataSetsParameters.get(dsName).get("tdir"),
+                                             meta.dataSetsParameters.get(dsName).get("prefix")))
+
+                        valid_series = fh.readMulDataWithLabel(
+                            os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                         meta.dataSetsParameters.get(dsName).get("tedir"),
+                                         meta.dataSetsParameters.get(dsName).get("prefix")+"_"+seed))
+                    else:
+                        valid_series = fh.readMulDataWithLabel(
+                            os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                         meta.dataSetsParameters.get(dsName).get("tedir"),
+                                         meta.dataSetsParameters.get(dsName).get("prefix")+"_"+seed))
+
+                    if inst:
+                        if not algMetrics.get(algName):
+                            tm = {}
+                            for mn in metricNames:
+                                tm[mn] = 0.0
+                            tm["time"] = 0.0
+                            tm["algName"] = algName
+                            algMetrics[algName] = tm
+                        else:
+                            tm = algMetrics[algName]
+                        try:
+                            start = time.time()
+                            if isinstance(inst, MachineLearningAlgorithm):
+                                if not (algName in hastrained):
+                                    inst.init(args, test_series.copy(), training_series, valid_series)
+                                    inst.training(writelossrate=False)
+                                    hastrained.append(algName)
+                                else:
+                                    inst.changeData(test_series.copy(), valid_series)
+                            rseries = inst.run()
+                            algMetrics[algName]["time"] = float(algMetrics[algName].get("time")) + time.time() - start
+                            predictAnomaly = dh.getAnomalyPoint(rseries)
+                            fh.writePointMiddleResult(
+                                r"sp/" + "_".join([algName, dsName, str(seed)]),
+                                predictAnomaly)
+                            mtools = fact.getMetricInstance(metricType)
+                            mtools.init(test_series, rseries)
+                            for mn in metricNames:
+                                algMetrics[algName][mn] = algMetrics[algName][mn] + getattr(mtools, mn, None)()
+                        except BaseException as be:
+                            traceback.print_exc()
+                            for mn in metricNames:
+                                tm[mn] = 0.0
+                            tm["time"] = 0.0
+                            algMetrics[algName] = tm
+
         for algMetric in algMetrics:
             for metric in metricNames:
                 algMetrics[algMetric][metric] = algMetrics[algMetric][metric] / (seeds.__len__())

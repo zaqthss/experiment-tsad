@@ -88,7 +88,7 @@ public class StareTune {
       }
 
       // read file
-      String rawPath = String.format("%s/%s.csv", dir, filePrefix);
+      String rawPath = String.format("%s/%s/%s.csv", dir,"test", filePrefix);
       System.out.println("loading " + rawPath);
       FileHandler fh = new FileHandler();
       TimeSeriesMulDim ts = fh.readMulDataWithLabel(rawPath);

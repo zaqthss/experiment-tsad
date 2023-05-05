@@ -1,12 +1,11 @@
-from parser import *
-
 class constants:
     # Threshold parameters
 
     model = ""
+    Hyperparameters = {}
     lr = {}
-    window ={}
-    dffw={}
+    window = {}
+    batch = {}
     lm_d = {
         'SMD': [(0.99995, 1.04), (0.99995, 1.06)],
         'synthetic': [(0.999, 1), (0.999, 1)],

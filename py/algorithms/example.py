@@ -1,9 +1,10 @@
 from typing import Dict
-from algorithms.algorithm import algorithm
+
+from algorithms.algorithm import Algorithm
 from entity import *
 
 
-class algExp(algorithm):
+class algExp(Algorithm):
 
     def __init__(self):
         self.series = None

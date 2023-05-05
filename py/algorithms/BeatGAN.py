@@ -1,22 +1,17 @@
-import math
-from typing import Dict
-
 import numpy as np
-import torch
 from sklearn.preprocessing import MinMaxScaler
-from torch.utils.data import TensorDataset, DataLoader
-
-from .BeatGANs.preprocess import load_datasetwithSeries
-from .algorithm import algorithm, machineLearningAlgorithm
+import math
 from entity import *
 from .BeatGANs.BeatGAN_CNN import BeatGAN_CNN
 from .BeatGANs.BeatGAN_RNN import BeatGAN_RNN
+from .BeatGANs.preprocess import load_datasetwithSeries
+from .algorithm import MachineLearningAlgorithm
 
 WINDOW=64
 STRIDE_TRAIN=5
 STRIDE_TEST=20
 
-class BeatGAN(machineLearningAlgorithm):
+class BeatGAN(MachineLearningAlgorithm):
 
 	def __init__(self):
 		super(BeatGAN, self).__init__()
@@ -37,6 +32,7 @@ class BeatGAN(machineLearningAlgorithm):
 		self.stride_size=5
 		self.lambdaa=args.get('lambdaa')
 		self.top_k=args.get('top_k')
+		#self.threshold = args.get('threshold')
 
 	def training(self):
 		if self.network=='CNN':
@@ -69,6 +65,7 @@ class BeatGAN(machineLearningAlgorithm):
 			alljoin.append(np.average(join[max(0,start):min(end, len(join))+1]))
 		alljoin=np.array(alljoin)
 		alljoin = MinMaxScaler(feature_range=(0, 1)).fit_transform(alljoin.reshape(-1, 1)).ravel()
+		self.score=alljoin
 		score = np.argsort(alljoin)
 		score = np.flipud(score)
 		reseries = series.copy()
@@ -111,8 +108,35 @@ class BeatGAN(machineLearningAlgorithm):
 			indext=index*self.stride_size
 			for i in range(indext, indext + self.seq_len):
 				reseries.timeseries[i].is_anomaly = True
-			score = drop_score(score, index, self.seq_len,len(self.series.timeseries),self.stride_size)
+			score = drop_score(score, index, self.seq_len,len(self.series.timeseries))
 			if len(score) == 0:
+				break
+		return reseries
+
+	'''def evaluate(self,score_threshold):
+		reseries = self.series.copy()
+		reseries.clear()
+		th_num = (int)(score_threshold * self.score.size)
+		score_sorted=np.sort(self.score)
+		score_sorted=np.flipud(score_sorted)
+		th_value = score_sorted[th_num-1]
+		for i in range(self.score.size):
+			if self.score[i]>=th_value:
+				reseries.timeseries[i].is_anomaly = True
+		return reseries'''
+	def evaluate(self,k):
+
+		reseries = self.series.copy()
+		reseries.clear()
+		score_sorted = np.argsort(self.score)
+		score_sorted = np.flipud(score_sorted)
+
+		for t in range(k):
+			index = score_sorted[0]
+			for i in range(index, min(index + self.seq_len, len(reseries))):
+				reseries.timeseries[i].is_anomaly = True
+			score_sorted = drop_score(score_sorted, index, self.seq_len, len(score_sorted))
+			if len(score_sorted) == 0:
 				break
 		return reseries
 

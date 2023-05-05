@@ -4,13 +4,13 @@
 # Time Series Archives. In 2020 IEEE International Conference on Data Mining (ICDM) 
 # (pp. 1190-1195). IEEE.
 
-import numpy as np
 from pprint import pprint
 from time import time
-from .utils import *
-from .constants import *
+
 from .diagnosis import *
 from .pot import *
+from .utils import *
+
 maxint = 200000
 
 # z-normalized euclidean distance

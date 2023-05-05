@@ -1,7 +1,8 @@
 import numpy as np
 
-from entity import timeSeries
 import instanceFactory as fact
+from entity import timeSeries
+
 
 def getAnomalySequences(series: timeSeries):
     currSet = []

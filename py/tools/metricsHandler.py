@@ -51,16 +51,28 @@ class pointMetrics(metrics):
                 self.tn = self.tn + 1
 
     def precision(self):
-        return 1.0 * self.tp / (self.tp + self.fp)
+        if self.tp + self.fp > 0:
+            return 1.0 * self.tp / (self.tp + self.fp)
+        else:
+            return 0.0
 
     def recall(self):
-        return 1.0 * self.tp / (self.tp + self.fn)
+        if self.tp + self.fn > 0:
+            return 1.0 * self.tp / (self.tp + self.fn)
+        else:
+            return 0.0
 
     def accuracy(self):
-        return 1.0 * (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
+        if self.tp + self.tn + self.fp + self.fn > 0:
+            return 1.0 * (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
+        else:
+            return 0.0
 
     def sensitive(self):
-        return 1.0 * self.tp / (self.tp + self.fp)
+        if self.tp + self.fp > 0:
+            return 1.0 * self.tp / (self.tp + self.fp)
+        else:
+            return 0.0
 
     def specificity(self):
         return 1.0 * self.tn / (self.tn + self.fn)
@@ -74,6 +86,17 @@ class pointMetrics(metrics):
         else:
             return -1
 
+    def fpr(self):
+        if self.fp + self.tn == 0:
+            return -1.0
+        else:
+            return self.fp / (self.fp + self.tn)
+
+    def fnr(self):
+        if self.fn + self.tp == 0:
+            return -1.0
+        else:
+            return self.fn / (self.fn + self.tp)
 
 
 class rangeMetrics(metrics):
@@ -81,7 +104,7 @@ class rangeMetrics(metrics):
     def __init__(self, alpha=0.0, bias="flat"):
         self.recallValue = 0.0
         self.precisionValue = 0.0
-        self.fmeasureValue=0.0
+        self.fmeasureValue = 0.0
         self.realAnomaly = {}
         self.rseq = {}
         self.pseq = {}
@@ -95,7 +118,7 @@ class rangeMetrics(metrics):
     def init(self, originalseries: timeSeries, series: timeSeries):
         self.recallValue = 0.0
         self.precisionValue = 0.0
-        self.fmeasureValue=0.0
+        self.fmeasureValue = 0.0
         self.overlaps = {}
         self.rseq = self.getAnomalySequences(originalseries)
         self.pseq = self.getAnomalySequences(series)
@@ -105,7 +128,7 @@ class rangeMetrics(metrics):
         self.createOverlapSet(self.rseq, self.pseq)
 
         for rIndex in range(0, self.rSize):
-            self.recallValue = self.recallValue+self.alpha * self.calcExistenceReward(rIndex) + (
+            self.recallValue = self.recallValue + self.alpha * self.calcExistenceReward(rIndex) + (
                     1 - self.alpha) * self.calcOverlapReward(
                 rIndex)
         self.recallValue = self.recallValue / self.rSize
@@ -118,17 +141,19 @@ class rangeMetrics(metrics):
 
             assert mul <= 1, "mul must <= 1"
             self.precisionValue += cardinalityFactor * mul
-
-        self.precisionValue = self.precisionValue / self.pSize
-        if self.precisionValue + self.recallValue > 0:
-            self.fmeasureValue=2 * self.precisionValue * self.recallValue / (self.precisionValue + self.recallValue)
+        if self.pSize == 0:
+            self.precisionValue = 0
         else:
-            self.fmeasureValue=0
+            self.precisionValue = self.precisionValue / self.pSize
+        if self.precisionValue + self.recallValue > 0:
+            self.fmeasureValue = 2 * self.precisionValue * self.recallValue / (self.precisionValue + self.recallValue)
+        else:
+            self.fmeasureValue = 0
 
-    def computeMetric(self, realAnomaly,predictAnomaly):
+    def computeMetric(self, realAnomaly, predictAnomaly):
         self.recallValue = 0.0
         self.precisionValue = 0.0
-        self.fmeasureValue=0.0
+        self.fmeasureValue = 0.0
         self.overlaps = {}
         self.rseq = realAnomaly
         self.pseq = predictAnomaly
@@ -138,7 +163,7 @@ class rangeMetrics(metrics):
         self.createOverlapSet(self.rseq, self.pseq)
 
         for rIndex in range(0, self.rSize):
-            self.recallValue = self.recallValue+self.alpha * self.calcExistenceReward(rIndex) + (
+            self.recallValue = self.recallValue + self.alpha * self.calcExistenceReward(rIndex) + (
                     1 - self.alpha) * self.calcOverlapReward(
                 rIndex)
         self.recallValue = self.recallValue / self.rSize
@@ -154,9 +179,9 @@ class rangeMetrics(metrics):
 
         self.precisionValue = self.precisionValue / self.pSize
         if self.precisionValue + self.recallValue > 0:
-            self.fmeasureValue=2 * self.precisionValue * self.recallValue / (self.precisionValue + self.recallValue)
+            self.fmeasureValue = 2 * self.precisionValue * self.recallValue / (self.precisionValue + self.recallValue)
         else:
-            self.fmeasureValue=0
+            self.fmeasureValue = 0
 
     def getAnomalySequences(self, series: timeSeries):
         currSet = []
@@ -244,5 +269,6 @@ class rangeMetrics(metrics):
 
     def recall(self):
         return self.recallValue
+
     def fmeasure(self):
         return self.fmeasureValue

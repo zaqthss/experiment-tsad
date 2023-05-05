@@ -75,7 +75,25 @@ public class NeighborProfile implements UniDimAlgorithm {
       index_list = all_score.indexOf(max_score);
     }
   }
-
+  public void evaluate(double score_threshold) {
+    timeseries.clear();
+    int th_num=(int)(score_threshold*score.size());
+    if(th_num==0) return;
+    ArrayList<SubseqScore> all_score = new ArrayList<SubseqScore>();
+    for (int i = 0; i < score.size(); i++) {
+      SubseqScore s = new SubseqScore(i, score.get(i));
+      all_score.add(s);
+    }
+    Collections.sort(all_score);
+    Collections.reverse(all_score);
+    double th_value=all_score.get(th_num-1).getScore();
+    for (int i = 0; i < all_score.size(); i++) {
+      if(all_score.get(i).getScore()>=th_value){
+        int index=all_score.get(i).getIndex();
+        timeseries.getTimePoint(index).setIs_anomaly(IS_ANOMALY.TRUE);
+      }
+    }
+  }
   public ArrayList<Double> getScore(){
     return this.score;
   }

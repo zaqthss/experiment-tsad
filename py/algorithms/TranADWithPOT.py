@@ -1,9 +1,14 @@
+import copy
+from time import time
+
+from entity import timeSeries
 from .TranADsWithPOT.alg import *
-from .algorithm import *
 from .TranADsWithPOT.src.constants import constants
+from .TranADsWithPOT.src.pot import pot_eval
+from .algorithm import MachineLearningAlgorithm
 
 
-class TranADWithPOT(machineLearningAlgorithm):
+class TranADWithPOT(MachineLearningAlgorithm):
     def __init__(self):
         super(TranADWithPOT, self).__init__()
         self.trainingSeries = None
@@ -18,13 +23,13 @@ class TranADWithPOT(machineLearningAlgorithm):
         self.optimizer = None
         self.model = None
         self.alg = "TranAD"
+        self.num_epochs = None
 
-    def init(self, args, series: timeSeries, trainingSeries: timeSeries):
+    def init(self, args, series: timeSeries, trainingSeries: timeSeries, validSeries=None):
         self.series = series
         self.trainingSeries = trainingSeries
-        constants.lr[self.alg] = 0.008
-        constants.args["model"] = self.alg
-        constants.lm[self.alg] = (0.993, 1)
+        constants.Hyperparameters[self.alg] = copy.deepcopy(args)
+        self.num_epochs = args["epoch"]
         train_loader, test_loader, self.labels = self.load_datasetwithSeries(self.series, trainingSeries)
         self.series.clear()
         self.model, self.optimizer, self.scheduler, self.epoch, self.accuracy_list = load_model(
@@ -50,7 +55,7 @@ class TranADWithPOT(machineLearningAlgorithm):
             self.trainD, self.testD = convert_to_windows(self.trainD, self.model), convert_to_windows(self.testD
                                                                                                       , self.model)
 
-    def load_datasetwithSeries(self, series, trainingSeries):
+    def load_datasetwithSeries(self, series, trainingSeries, validSeries: timeSeries=None):
         loader = [0, 1, 2]
         loader[0] = np.zeros([len(trainingSeries.timeseries), trainingSeries.dim])
         loader[1] = np.zeros([len(series.timeseries), series.dim])
@@ -75,11 +80,11 @@ class TranADWithPOT(machineLearningAlgorithm):
         labels = loader[2]
         return train_loader, test_loader, labels
 
-    def training(self):
+    def training(self,writelossrate=False):
         ### Training phase
-        num_epochs = 5
+
         start = time()
-        for e in list(range(self.epoch + 1, self.epoch + num_epochs + 1)):
+        for e in list(range(self.epoch + 1, self.epoch + self.num_epochs + 1)):
             lossT, lr = backprop(e, self.model, self.trainD, self.trainO, self.optimizer, self.scheduler)
             self.accuracy_list.append((lossT, lr))
         return time() - start
@@ -105,7 +110,7 @@ class TranADWithPOT(machineLearningAlgorithm):
         result.update(hit_att(loss, self.labels))
         result.update(ndcg(loss, self.labels))
 
-        pprint(result)
+        print(result)
 
         for i in range(len(preds[0])):
             for p in preds:

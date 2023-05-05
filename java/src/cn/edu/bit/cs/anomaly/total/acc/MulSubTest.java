@@ -1,9 +1,6 @@
 package cn.edu.bit.cs.anomaly.total.acc;
 
-import cn.edu.bit.cs.anomaly.LRRDS;
-import cn.edu.bit.cs.anomaly.NeighborProfile;
-import cn.edu.bit.cs.anomaly.PBAD;
-import cn.edu.bit.cs.anomaly.SAND;
+import cn.edu.bit.cs.anomaly.*;
 import cn.edu.bit.cs.anomaly.entity.Range;
 import cn.edu.bit.cs.anomaly.entity.TimeSeries;
 import cn.edu.bit.cs.anomaly.entity.TimeSeriesMulDim;
@@ -26,11 +23,11 @@ public class MulSubTest {
     //String[] vars = {"exercise", "exathlon", "swat", "smd"};
     //String[] vars = {"exercise_1k"};
     // String[] vars = {"exercise"};
-    String[] vars = {"swat"};
-    int[] dims = {38}; 
-    boolean[] willOperate = {true, false, false, false};
+    String[] vars = {"exercise", "exathlon", "swat", "smd"};
+    int[] dims = {3,19,5138};
+    boolean[] willOperate = {false, false, false, false,true};
 
-    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP"};
+    String[] algNames = {"PBAD","LRRDS","NP","SAND","IDK"};
     String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
@@ -49,6 +46,7 @@ public class MulSubTest {
     LRRDS lrrds = null;
     SAND sand = null;
     NeighborProfile np = null;
+    IDK idk=null;
 
     double alpha = 0;
     POS_BIAS bias = POS_BIAS.FLAT;
@@ -165,11 +163,39 @@ public class MulSubTest {
             alpha, bias, tsArray, realAnomalyMap.get(dsName), metrics[index][algIndex]);
       }
 
+      //idk
+      algIndex++;
+      if (willOperate[algIndex]) {
+        System.out.println(algNames[algIndex] + " begin");
+        if (seriesMap.containsKey(dsName)) {
+          tsArray = seriesMap.get(dsName);
+        } else if (seriesMulMap.containsKey(dsName)) {
+          tsArray = seriesMulMap.get(dsName).convert();
+        } else {
+          timeSeriesMulDim = fh.readMulDataWithLabel(rawPath);
+          tsArray = timeSeriesMulDim.convert();
+          seriesMulMap.put(dsName, timeSeriesMulDim);
+          ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
+          realAnomalyMap.put(dsName, realAnomaly);
+        }
+        algtime[algIndex][0] = System.currentTimeMillis();
+        idk = new IDK();
+        Map<String, Object> idkParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+        for (TimeSeries ts : tsArray) {
+          idk.init(idkParams, ts);
+          idk.run();
+        }
+        algtime[algIndex][1] = System.currentTimeMillis();
+        DataHandler.evaluate(
+                alpha, bias, tsArray, realAnomalyMap.get(dsName), metrics[index][algIndex]);
+      }
+
+
       for (int algi = 0; algi < ALGNUM; ++algi) {
         totaltime[index][algi] += algtime[algi][1] - algtime[algi][0];
       }
       // write results
-      fh.writeResults("acc", "mul-sub-", vars, algNames, metricNames, totaltime, metrics, 1);
+      fh.writeResults("acc", "mul-sub1-", vars, algNames, metricNames, totaltime, metrics, 1);
     } // end of rIndex
   }
 }

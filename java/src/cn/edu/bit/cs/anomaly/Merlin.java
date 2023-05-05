@@ -26,9 +26,22 @@ public class Merlin implements UniDimAlgorithm {
 		MERLIN_topK(this.timeseries);
 		for(int i=0;i<k;i++) {
 			int index=indices[0][i];
+			if(index==0) continue;
 			for(int j=index;j<Math.min(index+minL,T.getLength());j++) {
 				T.getTimePoint(j).setIs_anomaly(IS_ANOMALY.TRUE);
 			}		
+		}
+	}
+
+	public void evaluate(double score_threshold){
+		T.clear();
+		int th_num=(int)(score_threshold*k);
+		for(int i=0;i<th_num;i++) {
+			int index=indices[0][i];
+			if(index==0) continue;
+			for(int j=index;j<Math.min(index+minL,T.getLength());j++) {
+				T.getTimePoint(j).setIs_anomaly(IS_ANOMALY.TRUE);
+			}
 		}
 	}
 
@@ -73,6 +86,9 @@ public class Merlin implements UniDimAlgorithm {
 				}else {
 					kMultiplier=kMultiplier*0.95;
 				}
+				if(r*kMultiplier<=10e-3){
+					break;
+				}
 			}
 			exclusionIndices.add(indices[0][ki]);
 		}
@@ -91,6 +107,9 @@ public class Merlin implements UniDimAlgorithm {
 						r=r*0.99;
 					}else {
 						kMultiplier=kMultiplier*0.95;
+					}
+					if(r*kMultiplier<=1e-2){
+						break;
 					}
 				}
 				exclusionIndices.add(indices[i][ki]);
@@ -118,6 +137,9 @@ public class Merlin implements UniDimAlgorithm {
 						r=r*0.99;
 					}else {
 						kMultiplier=kMultiplier*0.95;
+					}
+					if(r*kMultiplier<=1e-2){
+						break;
 					}
 		    	}
 		    	exclusionIndices.add(indices[i][ki]);

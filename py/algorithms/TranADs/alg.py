@@ -1,13 +1,10 @@
-import numpy as np
-from tqdm import tqdm
-
-from .src import models
-from .src.models import *
-from .src.merlin import *
-from torch.utils.data import Dataset, DataLoader, TensorDataset
 import torch.nn as nn
-from time import time
-from pprint import pprint
+from torch.utils.data import DataLoader, TensorDataset
+from tqdm import tqdm
+import tools.fileHandler as fh
+from .src import models
+from .src.merlin import *
+from .src.models import *
 # from beepy import beep
 from ..RCoders.eval_methods import calc_seq
 
@@ -35,12 +32,12 @@ def load_model(modelname, dims):
     return model, optimizer, scheduler, epoch, accuracy_list
 
 
-def backprop(epoch, model, data, dataO, optimizer, scheduler, training=True):
+def backprop(epoch, model, data, dataO, optimizer, scheduler, training=True, writeLR=True):
     l = nn.MSELoss(reduction='mean' if training else 'none')
     feats = dataO.shape[1]
     if 'DAGMM' in model.name:
         l = nn.MSELoss(reduction='none')
-        compute = ComputeLoss(model, 0.1, 0.005, 'cpu', model.n_gmm)
+        compute = ComputeLoss(model, 0.1, 0.005, 'gpu', model.n_gmm)
         n = epoch + 1;
         w_size = model.n_window
         l1s = [];
@@ -110,6 +107,8 @@ def backprop(epoch, model, data, dataO, optimizer, scheduler, training=True):
                 loss.backward()
                 optimizer.step()
             tqdm.write(f'Epoch {epoch},\tMSE = {np.mean(mses)},\tKLD = {np.mean(klds)}')
+            if writeLR:
+                fh.writeLR(model.name, epoch, {"MSE": np.mean(mses), "KLD": np.mean(klds)})
             scheduler.step()
             return loss.item(), optimizer.param_groups[0]['lr']
         else:
@@ -138,6 +137,8 @@ def backprop(epoch, model, data, dataO, optimizer, scheduler, training=True):
                 optimizer.step()
             scheduler.step()
             tqdm.write(f'Epoch {epoch},\tL1 = {np.mean(l1s)},\tL2 = {np.mean(l2s)}')
+            if writeLR:
+                fh.writeLR(model.name, epoch, {"L1": np.mean(l1s), "L2": np.mean(l2s)})
             return np.mean(l1s) + np.mean(l2s), optimizer.param_groups[0]['lr']
         else:
             ae1s, ae2s, ae2ae1s = [], [], []
@@ -168,6 +169,8 @@ def backprop(epoch, model, data, dataO, optimizer, scheduler, training=True):
                 loss.backward()
                 optimizer.step()
             tqdm.write(f'Epoch {epoch},\tMSE = {np.mean(l1s)}')
+            if writeLR:
+                fh.writeLR(model.name, epoch, {"MSE": np.mean(l1s)})
             return np.mean(l1s), optimizer.param_groups[0]['lr']
         else:
             xs = []
@@ -213,6 +216,8 @@ def backprop(epoch, model, data, dataO, optimizer, scheduler, training=True):
                 dls.append(dl.item())
             # tqdm.write(f'Epoch {epoch},\tMSE = {mse},\tG = {gl},\tD = {dl}')
             tqdm.write(f'Epoch {epoch},\tMSE = {np.mean(mses)},\tG = {np.mean(gls)},\tD = {np.mean(dls)}')
+            if writeLR:
+                fh.writeLR(model.name, epoch, {"MSE": np.mean(mses), "G": np.mean(gls), "D": np.mean(dls)})
             return np.mean(gls) + np.mean(dls), optimizer.param_groups[0]['lr']
         else:
             outputs = []
@@ -233,6 +238,7 @@ def backprop(epoch, model, data, dataO, optimizer, scheduler, training=True):
         n = epoch + 1;
         w_size = model.n_window
         l1s, l2s = [], []
+
         if training:
             for d, _ in dataloader:
                 local_bs = d.shape[0]
@@ -248,6 +254,8 @@ def backprop(epoch, model, data, dataO, optimizer, scheduler, training=True):
                 optimizer.step()
             scheduler.step()
             tqdm.write(f'Epoch {epoch},\tL1 = {np.mean(l1s)}')
+            if writeLR:
+                fh.writeLR(model.name, epoch, {"L1": np.mean(l1s)})
             return np.mean(l1s), optimizer.param_groups[0]['lr']
         else:
             for d, _ in dataloader:

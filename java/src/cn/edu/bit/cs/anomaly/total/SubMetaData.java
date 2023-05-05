@@ -118,7 +118,7 @@ public class SubMetaData implements MetaData {
                       put("dim", 3);
                     }
                   });
-          put(
+          /*put(
                   "sed_size",
                   new HashMap<String, Object>() {
                       {
@@ -126,7 +126,7 @@ public class SubMetaData implements MetaData {
                           put("rawPrefix", "sed");
                           put("dim", 1);
                       }
-                  });
+                  });*/
           put(
                   "swat_size",
                   new HashMap<String, Object>() {
@@ -340,7 +340,7 @@ public class SubMetaData implements MetaData {
                               put("window_incr", 10);
                               put("bin_size", 2);
                               put("max_feature", 50);
-                              put("threshold", 0.1);
+                              put("threshold", 0.09);
                             }
                           });
                       put(
@@ -356,11 +356,11 @@ public class SubMetaData implements MetaData {
                           "SAND",
                           new HashMap<String, Object>() {
                             {
-                              put("k", 6);
-                              put("init_length", 1000);
-                              put("batch_size", 1000);
-                              put("pattern_length", 45);
-                              put("top_k", 10);
+                                put("init_length", 1000);
+                                put("batch_size", 1000);
+                                put("pattern_length", 55);
+                                put("top_k", 4);
+                                put("k",6);
                             }
                           });
                       put(
@@ -368,32 +368,43 @@ public class SubMetaData implements MetaData {
                           new HashMap<String, Object>() {
                             {
                               put("batchsize", 5000);
-                              put("max_sample", 32);
-                              put("sub_len", 45);
-                              put("top_k", 10);
-                              put("scale", "zscore");
+                              put("max_sample", 64);
+                              put("sub_len", 50);
+                              put("top_k", 4);
+                              put("scale", "demean");
                             }
                           });
                       put(
                               "MERLIN",
                               new HashMap<String, Object>() {
                                 {
-                                  put("minL", 50);
-                                  put("maxL", 50);
-                                  put("top_k", 10);
+                                    put("minL", 55);
+                                    put("maxL", 55);
+                                    put("top_k", 4);
                                 }
                               });
                       put(
                               "GrammarViz",
                               new HashMap<String, Object>() {
                                 {
-                                  put("SAX_WINDOW_SIZE", 40);
-                                  put("SAX_PAA_SIZE", 10);
-                                  put("SAX_ALPHABET_SIZE", 10);
-                                  put("SAX_NORM_THRESHOLD", 0.01);
-                                  put("DISCORDS_NUM", 10);
+                                    put("SAX_WINDOW_SIZE", 50);
+                                    put("SAX_PAA_SIZE", 10);
+                                    put("SAX_ALPHABET_SIZE", 4);
+                                    put("SAX_NORM_THRESHOLD", 0.01);
+                                    put("DISCORDS_NUM", 10);
                                 }
                               });
+                          put(
+                                  "IDK",
+                                  new HashMap<String, Object>() {
+                                      {
+                                          put("sample_num", 100);
+                                          put("sample_size1", 16);
+                                          put("sample_size2", 2);
+                                          put("window_size", 40);
+                                          put("top_k", 10);
+                                      }
+                                  });
         			  }
            });
           put(
@@ -462,6 +473,17 @@ public class SubMetaData implements MetaData {
                                   put("DISCORDS_NUM", 10);
                                 }
                               });
+                          put(
+                                  "IDK",
+                                  new HashMap<String, Object>() {
+                                      {
+                                          put("sample_num", 100);
+                                          put("sample_size1", 4);
+                                          put("sample_size2", 8);
+                                          put("window_size", 60);
+                                          put("top_k", 10);
+                                      }
+                                  });
         			  }
            });
             put(
@@ -530,6 +552,17 @@ public class SubMetaData implements MetaData {
                                             put("DISCORDS_NUM", 10);
                                         }
                                     });
+                            put(
+                                    "IDK",
+                                    new HashMap<String, Object>() {
+                                        {
+                                            put("sample_num", 100);
+                                            put("sample_size1", 16);
+                                            put("sample_size2", 4);
+                                            put("window_size", 40);
+                                            put("top_k", 10);
+                                        }
+                                    });
                         }
                     });
           put(
@@ -596,7 +629,7 @@ public class SubMetaData implements MetaData {
                                       put("window_incr", 10);
                                       put("bin_size", 2);
                                       put("max_feature", 50);
-                                      put("threshold", 0.1);
+                                      put("threshold", 0.09);
                                     }
                                   });
                               put(
@@ -612,44 +645,55 @@ public class SubMetaData implements MetaData {
                                   "SAND",
                                   new HashMap<String, Object>() {
                                     {
-                                      put("k", 6);
-                                      put("init_length", 1000);
-                                      put("batch_size", 1000);
-                                      put("pattern_length", 45);
-                                      put("top_k", 10);
+                                        put("init_length", 1000);
+                                        put("batch_size", 1000);
+                                        put("pattern_length", 55);
+                                        put("top_k", 4);
+                                        put("k",6);
                                     }
                                   });
                               put(
                                   "NP",
                                   new HashMap<String, Object>() {
                                     {
-                                      put("batchsize", 5000);
-                                      put("max_sample", 32);
-                                      put("sub_len", 45);
-                                      put("top_k", 10);
-                                      put("scale", "zscore");
+                                        put("batchsize", 5000);
+                                        put("max_sample", 64);
+                                        put("sub_len", 50);
+                                        put("top_k", 4);
+                                        put("scale", "demean");
                                     }
                                   });
                               put(
                                       "MERLIN",
                                       new HashMap<String, Object>() {
                                         {
-                                          put("minL", 50);
-                                          put("maxL", 50);
-                                          put("top_k", 10);
+                                            put("minL", 55);
+                                            put("maxL", 55);
+                                            put("top_k", 4);
                                         }
                                       });
                               put(
                                       "GrammarViz",
                                       new HashMap<String, Object>() {
                                         {
-                                          put("SAX_WINDOW_SIZE", 40);
+                                          put("SAX_WINDOW_SIZE", 50);
                                           put("SAX_PAA_SIZE", 10);
-                                          put("SAX_ALPHABET_SIZE", 10);
+                                          put("SAX_ALPHABET_SIZE", 4);
                                           put("SAX_NORM_THRESHOLD", 0.01);
                                           put("DISCORDS_NUM", 10);
                                         }
                                       });
+                          put(
+                                  "IDK",
+                                  new HashMap<String, Object>() {
+                                      {
+                                          put("sample_num", 100);
+                                          put("sample_size1", 16);
+                                          put("sample_size2", 2);
+                                          put("window_size", 40);
+                                          put("top_k", 10);
+                                      }
+                                  });;
         			  }
            });
             put(
@@ -716,6 +760,17 @@ public class SubMetaData implements MetaData {
                                             put("SAX_ALPHABET_SIZE", 4);
                                             put("SAX_NORM_THRESHOLD", 0.01);
                                             put("DISCORDS_NUM", 10);
+                                        }
+                                    });
+                            put(
+                                    "IDK",
+                                    new HashMap<String, Object>() {
+                                        {
+                                            put("sample_num", 100);
+                                            put("sample_size1", 4);
+                                            put("sample_size2", 8);
+                                            put("window_size", 60);
+                                            put("top_k", 10);
                                         }
                                     });
                         }
@@ -959,6 +1014,17 @@ public class SubMetaData implements MetaData {
                                     put("DISCORDS_NUM", 8);
                                 }
                             });
+                    put(
+                            "IDK",
+                            new HashMap<String, Object>() {
+                                {
+                                    put("sample_num", 100);
+                                    put("sample_size1", 4);
+                                    put("sample_size2", 8);
+                                    put("window_size", 150);
+                                    put("top_k", 8);
+                                }
+                            });
                 }
               });
 
@@ -1076,6 +1142,17 @@ public class SubMetaData implements MetaData {
                               put("DISCORDS_NUM", 4);
                             }
                           });
+                    put(
+                            "IDK",
+                            new HashMap<String, Object>() {
+                                {
+                                    put("sample_num", 100);
+                                    put("sample_size1", 4);
+                                    put("sample_size2", 8);
+                                    put("window_size", 207);
+                                    put("top_k", 3);
+                                }
+                            });
                 }
               });
 
@@ -1145,6 +1222,17 @@ public class SubMetaData implements MetaData {
                               put("DISCORDS_NUM", 21);
                             }
                           });
+                    put(
+                            "IDK",
+                            new HashMap<String, Object>() {
+                                {
+                                    put("sample_num", 100);
+                                    put("sample_size1", 4);
+                                    put("sample_size2", 2);
+                                    put("window_size", 64);
+                                    put("top_k", 21);
+                                }
+                            });
 
                 }
               });
@@ -1215,6 +1303,17 @@ public class SubMetaData implements MetaData {
                               put("DISCORDS_NUM", 3);
                             }
                           });
+                    put(
+                            "IDK",
+                            new HashMap<String, Object>() {
+                                {
+                                    put("sample_num", 100);
+                                    put("sample_size1", 8);
+                                    put("sample_size2", 2);
+                                    put("window_size", 800);
+                                    put("top_k", 3);
+                                }
+                            });
                 }
               });
           put(
@@ -1283,6 +1382,17 @@ public class SubMetaData implements MetaData {
                                   put("DISCORDS_NUM", 2);
                                 }
                               });
+                        put(
+                                "IDK",
+                                new HashMap<String, Object>() {
+                                    {
+                                        put("sample_num", 100);
+                                        put("sample_size1", 2);
+                                        put("sample_size2", 8);
+                                        put("window_size", 600);
+                                        put("top_k", 2);
+                                    }
+                                });
                     }
                   });
           put(
@@ -1349,6 +1459,17 @@ public class SubMetaData implements MetaData {
                                     put("SAX_ALPHABET_SIZE", 10);
                                     put("SAX_NORM_THRESHOLD", 0.01);
                                     put("DISCORDS_NUM", 7);
+                                }
+                            });
+                    put(
+                            "IDK",
+                            new HashMap<String, Object>() {
+                                {
+                                    put("sample_num", 100);
+                                    put("sample_size1", 4);
+                                    put("sample_size2", 8);
+                                    put("window_size", 60);
+                                    put("top_k", 7);
                                 }
                             });
                 }
@@ -1468,6 +1589,17 @@ public class SubMetaData implements MetaData {
                                     put("DISCORDS_NUM", 26);
                                 }
                             });
+                    put(
+                            "IDK",
+                            new HashMap<String, Object>() {
+                                {
+                                    put("sample_num", 100);
+                                    put("sample_size1", 4);
+                                    put("sample_size2", 8);
+                                    put("window_size", 380);
+                                    put("top_k", 26);
+                                }
+                            });
                 }
               });
           put(
@@ -1534,6 +1666,17 @@ public class SubMetaData implements MetaData {
                                     put("SAX_ALPHABET_SIZE", 10);
                                     put("SAX_NORM_THRESHOLD", 0.01);
                                     put("DISCORDS_NUM", 6);
+                                }
+                            });
+                    put(
+                            "IDK",
+                            new HashMap<String, Object>() {
+                                {
+                                    put("sample_num", 100);
+                                    put("sample_size1", 4);
+                                    put("sample_size2", 8);
+                                    put("window_size", 270);
+                                    put("top_k", 6);
                                 }
                             });
                 }
@@ -1985,6 +2128,17 @@ public class SubMetaData implements MetaData {
                                   put("DISCORDS_NUM", 10);
                               }
                           });
+                    put(
+                            "IDK",
+                            new HashMap<String, Object>() {
+                                {
+                                    put("sample_num", 100);
+                                    put("sample_size1", 4);
+                                    put("sample_size2", 8);
+                                    put("window_size", 60);
+                                    put("top_k", 10);
+                                }
+                            });
                 }
               });
             put(
@@ -1998,7 +2152,7 @@ public class SubMetaData implements MetaData {
                                             put("window_size", 20);
                                             put("window_incr", 10);
                                             put("bin_size", 2);
-                                            put("threshold", 0.1);
+                                            put("threshold", 0.09);
                                             put("max_feature", 50);
                                         }
                                     });
@@ -2017,8 +2171,8 @@ public class SubMetaData implements MetaData {
                                         {
                                             put("init_length", 1000);
                                             put("batch_size", 1000);
-                                            put("pattern_length", 45);
-                                            put("top_k", 12);
+                                            put("pattern_length", 55);
+                                            put("top_k", 10);
                                             put("k",6);
                                         }
                                     });
@@ -2029,7 +2183,7 @@ public class SubMetaData implements MetaData {
                                             put("batchsize", 5000);
                                             put("max_sample", 64);
                                             put("sub_len", 50);
-                                            put("top_k", 12);
+                                            put("top_k", 10);
                                             put("scale", "demean");
                                         }
                                     });
@@ -2039,7 +2193,7 @@ public class SubMetaData implements MetaData {
                                         {
                                             put("minL", 55);
                                             put("maxL", 55);
-                                            put("top_k", 12);
+                                            put("top_k", 10);
                                         }
                                     });
                             put(
@@ -2051,6 +2205,17 @@ public class SubMetaData implements MetaData {
                                             put("SAX_ALPHABET_SIZE", 4);
                                             put("SAX_NORM_THRESHOLD", 0.01);
                                             put("DISCORDS_NUM", 10);
+                                        }
+                                    });
+                            put(
+                                    "IDK",
+                                    new HashMap<String, Object>() {
+                                        {
+                                            put("sample_num", 100);
+                                            put("sample_size1", 16);
+                                            put("sample_size2", 2);
+                                            put("window_size", 40);
+                                            put("top_k", 10);
                                         }
                                     });
                         }
@@ -2119,6 +2284,17 @@ public class SubMetaData implements MetaData {
                                             put("SAX_ALPHABET_SIZE", 4);
                                             put("SAX_NORM_THRESHOLD", 0.01);
                                             put("DISCORDS_NUM", 10);
+                                        }
+                                    });
+                            put(
+                                    "IDK",
+                                    new HashMap<String, Object>() {
+                                        {
+                                            put("sample_num", 100);
+                                            put("sample_size1", 16);
+                                            put("sample_size2", 4);
+                                            put("window_size", 40);
+                                            put("top_k", 10);
                                         }
                                     });
                         }

@@ -1,18 +1,13 @@
-import pickle
-import os
-import pandas as pd
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 
 from .src import models
-from .src.models import *
-from .src.constants import *
-from .src.pot import *
-from .src.utils import *
 from .src.diagnosis import *
-from torch.utils.data import Dataset, DataLoader, TensorDataset
-import torch.nn as nn
-from time import time
-from pprint import pprint
+from .src.models import *
+from .src.utils import *
+
+
 # from beepy import beep
 
 def convert_to_windows(data, model):

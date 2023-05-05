@@ -1,19 +1,20 @@
-import instanceFactory as fact
-import tools.fileHandler as fh
-import tools.dataHandler as dh
 from itertools import product
 
-dsName = "uni_subs_sp"
-dsDir = "syn/sub/uni_subs_sp"
+import instanceFactory as fact
+import tools.dataHandler as dh
+import tools.fileHandler as fh
+
+dsName = "uni_subg_sp"
+dsDir = "syn/sub/uni_subg_sp"
 algName = "NormA"
 metricType = "subsequence"
 metricNames = ["precision", "recall","fmeasure"]
 middleoutDir="middle"
 outDir = "tune"
 args = {
-    'pattern_length':[45],
-    'nm_size':[180],
-    'top_k':[2,3,4]
+    'pattern_length':[45,50,55,60],
+    'nm_size':[180,200,220,240],
+    'top_k':[1,2,3,4,5]
 }
 writeMiddleResult = False
 algMetrics = {}
@@ -33,7 +34,7 @@ if inst:
             algMetrics[algName][mn] = 0.0
 
         inst.init(arg, series)
-        rseries = inst.run()
+        rseries,_ = inst.run()
         mtools = fact.getMetricInstance(metricType)
         mtools.init(series, rseries)
         predictAnomaly=dh.getAnomalySequences(rseries)

@@ -1,18 +1,17 @@
 import os
+import time
 import traceback
 
-import algorithms.algorithm
+from algorithms.algorithm import MachineLearningAlgorithm
 import instanceFactory as fact
-import tools.fileHandler as fh
 import metaData as meta
+import tools.fileHandler as fh
 from entity import timeSeriesMul
-from tools.metricsHandler import pointMetrics
-import time
 
-#dsNames = ["yahoo", "twitter", "dlr", "ecg", "smtp", "exathlon_sp_pos", "uni_subg_sp_pos", "uni_subs_sp_pos","uni_subt_sp_pos"]
-dsNames = ["uni_subg_sp_pos"]
-#algNames = ["TranADWithPOT", "TranAD", "USAD", "OmniAnomaly", "RCoder", "GDN"]
-algNames = ["OmniAnomaly"]
+dsNames = ["yahoo", "twitter", "dlr", "ecg", "smtp", "exathlon_sp_pos", "uni_subg_sp_pos", "uni_subs_sp_pos","uni_subt_sp_pos"]
+#dsNames = ["yahoo", "twitter", "dlr", "ecg", "smtp"]
+# algNames = ["TranADWithPOT", "TranAD", "USAD", "OmniAnomaly", "RCoder", "GDN"]
+algNames = ["TranADWithPOT", "TranAD", "USAD", "OmniAnomaly", "RCoder", "GDN"]
 metricType = "subsequence"
 metricNames = ["precision", "recall", "fmeasure"]
 outDir = "ap"
@@ -22,19 +21,30 @@ totalMetrics = {}
 
 
 def runtest(dsName, ):
+    global training_series
     for algName in algNames:
         inst = fact.getAlgInstance(algName)
-        series = fh.readMulDataWithLabel(
+        test_series = fh.readMulDataWithLabel(
             os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
                          meta.dataSetsParameters.get(dsName).get("tedir"),
                          meta.dataSetsParameters.get(dsName).get("prefix")))
-        if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
+        if isinstance(inst, MachineLearningAlgorithm):
             if meta.dataSetsParameters.get(dsName).get("tdir") is None:
                 raise IOError("Trining file is needed")
-            triningSeries = fh.readMulDataWithLabel(
+            training_series = fh.readMulDataWithLabel(
                 os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
                              meta.dataSetsParameters.get(dsName).get("tdir"),
                              meta.dataSetsParameters.get(dsName).get("prefix")))
+            valid_series = fh.readMulDataWithLabel(
+                os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                             meta.dataSetsParameters.get(dsName).get("vdir"),
+                             dsName + "L"))
+        else:
+            valid_series = fh.readMulDataWithLabel(
+                os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                             meta.dataSetsParameters.get(dsName).get("vdir"),
+                             dsName + "N"))
+
         args = meta.algorithmsParameters.get(algName).get(dsName)
 
         if inst:
@@ -49,27 +59,30 @@ def runtest(dsName, ):
                 algMetrics[algName + "_ap"] = tm.copy()
             try:
                 start = time.time()
-                if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
-                    inst.init(args, series.copy(), triningSeries)
-                    inst.training()
+                if isinstance(inst, MachineLearningAlgorithm):
+                    inst.init(args, test_series.copy(), training_series, valid_series)
+                    inst.training(writelossrate=False)
                 else:
-                    inst.init(args, series.copy())
+                    inst.init(args, test_series.copy(), valid_series)
                 rseries = inst.run()
                 algMetrics[algName]["time"] = time.time() - start
                 mtools = fact.getMetricInstance(metricType)
-                mtools.init(series, rseries)
+                mtools.init(test_series, rseries)
                 for mn in metricNames:
                     algMetrics[algName][mn] = getattr(mtools, mn, None)()
-                rseries, latency = adjustpredict(series, rseries)
+                rseries, latency = adjustpredict(test_series, rseries)
                 mtools = fact.getMetricInstance(metricType)
-                mtools.init(series, rseries)
+                mtools.init(test_series, rseries)
                 algMetrics[algName + "_ap"]["latency"] = latency
                 for mn in metricNames:
                     algMetrics[algName + "_ap"][mn] = getattr(mtools, mn, None)()
 
             except BaseException as be:
                 traceback.print_exc()
-
+                for mn in metricNames:
+                    tm[mn] = "Error"
+                tm["time"] = "Error"
+                algMetrics[algName] = tm
 
 def adjustpredict(series: timeSeriesMul, rseries: timeSeriesMul):
     actual = series.timeseries
@@ -111,5 +124,5 @@ for dsName in dsNames:
             totalMetrics[mn][dsName]["dsName"] = dsName
     algMetrics = {}
 for mn in totalMetrics:
-    fh.writeResult(outDir + "/" + "_".join(["ap_only_sub", metricType, mn]), totalMetrics[mn],
+    fh.writeResult(outDir + "/" + "_".join(["ap", metricType, mn]), totalMetrics[mn],
                    ["dsName"] + algNames + [s + "_ap" for s in algNames])

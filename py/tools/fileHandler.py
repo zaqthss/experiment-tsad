@@ -1,7 +1,9 @@
 import csv
 import os.path
+import pathlib
+from datetime import datetime
 from typing import Dict
-
+from algorithms.TranADs.src.constants import constants
 import pandas
 
 from entity import *
@@ -9,6 +11,7 @@ from entity import *
 dataPath = "../data/"
 resultPath = "result/"
 middlePath = "../middle/"
+LRPath = "LossRate/"
 
 def readUniDataWithoutLabel(fname):
     ts = timeSeriesUni()
@@ -30,7 +33,6 @@ def readUniDataWithoutLabel(fname):
             ts.timeseries.append(tp)
     return ts
 
-
 def readUniDataWithLabel(fname):
     ts = timeSeriesUni()
     with open(dataPath + fname + ".csv") as f:
@@ -50,7 +52,6 @@ def readUniDataWithLabel(fname):
             tp.is_anomaly = bool(int(float(line[-1])))
             ts.timeseries.append(tp)
     return ts
-
 
 def readMulDataWithoutLabel(fname):
     ts = timeSeriesMul()
@@ -74,7 +75,6 @@ def readMulDataWithoutLabel(fname):
         ts.dim = len(line) - 1
     return ts
 
-
 def readMulDataWithLabel(fname):
     ts = timeSeriesMul()
     with open(dataPath + fname + ".csv") as f:
@@ -96,7 +96,6 @@ def readMulDataWithLabel(fname):
             ts.timeseries.append(tp)
         ts.dim = len(line) - 2
     return ts
-
 
 def writeResult(fname, result: Dict, title):
     fname = resultPath + fname + ".csv"
@@ -148,6 +147,57 @@ def writeSubResult(fname,title,vars,algNames,result,metricNames):
                         line.append(result.get(v).get(alg).get(metric))
                 writer.writerow(line)
         f.close()
+    for a in algNames:
+        fname_total = resultPath + '_'.join([fname,metric,title]) + ".csv"
+        with open(fname_total, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(head)
+            for v in vars:
+                line=[]
+                line.append(v)
+                for alg in algNames:
+                    if result.get(v).get(alg):
+                        line.append(result.get(v).get(alg).get(metric))
+                writer.writerow(line)
+        f.close()
+
+def writeThresholdResult(fname,title,types,vars,algNames,result,metricNames):
+    head = []
+    head.append(title)
+    for metric in metricNames:
+        head.append(metric)
+    for type in types:
+        for a in algNames:
+            fname_total = resultPath +fname+ '-'.join(['uni_'+type+'_sp',a, title]) + ".csv"
+            with open(fname_total, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(head)
+                for v in vars:
+                    line = []
+                    line.append(v)
+                    if result.get(type).get(a).get(v):
+                        for metric in metricNames:
+                            line.append(result.get(type).get(a).get(v).get(metric))
+                    writer.writerow(line)
+            f.close()
+
+def writeAUCResult(fname,title,types,algNames,result):
+    head = []
+    head.append(title)
+    for a in algNames:
+        head.append(a)
+    for type in types:
+        fname_total = resultPath + fname + '-'.join(['uni_' + type + '_sp', title]) + ".csv"
+        with open(fname_total, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(head)
+            for a in algNames:
+                line = []
+                line.append(a)
+                if result.get(type).get(a):
+                    line.append(result.get(type).get(a))
+                writer.writerow(line)
+        f.close()
 
 def subDumper(fname,title,vars,metricNames,result):
     head = []
@@ -190,3 +240,22 @@ def writeSeries(fname, series: timeSeries):
             fname = ("_".join([resultPath + fname,str(i),".csv"]))
             break
     df.to_csv(fname)
+
+def writeLR(model,epoch,lr):
+    date = datetime.now().strftime("%Y%m%d")
+    result = {**constants.Hyperparameters[model],**{"currepoch":epoch},**lr}
+    fname = resultPath+LRPath+'_'.join([model, result["dsName"], date])+".csv"
+    exist = pathlib.Path(fname).exists()
+    with open(fname, 'a', newline='') as f:
+        writer = csv.DictWriter(f,result.keys())
+        if not exist:
+            writer.writeheader()
+        writer.writerow(result)  # writerows方法是一下子写入多行内容
+    f.close()
+
+
+def writeTemporal(fname,data):
+    fname = os.path.join(resultPath, "temp", fname)+".csv"
+    with open(fname, 'a', newline='') as f:
+        f.write(data)
+        f.write(os.linesep)

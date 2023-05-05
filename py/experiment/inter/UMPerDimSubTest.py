@@ -1,14 +1,10 @@
 import os
+import time
 
-import algorithms.algorithm
 import instanceFactory as fact
-import tools.fileHandler as fh
-import tools.dataHandler as dh
 import metaData as meta
-from tools.metricsHandler import pointMetrics
-import time
-
-import time
+import tools.dataHandler as dh
+import tools.fileHandler as fh
 
 dsNames=["mul_ncor_subg"]
 algNames = ["BeatGAN"]

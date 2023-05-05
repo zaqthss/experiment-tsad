@@ -5,13 +5,14 @@ Created on Thu Dec 10 11:52:54 2020
 @author: aabdulaal
 ................................................................................................................................
 """
+from typing import List, Optional
+
 import numpy as np
 import tensorflow as tf
 from tensorflow.python.keras.constraints import NonNeg
 from tensorflow.python.keras.initializers import Constant
 from tensorflow.python.keras.layers import Dense, Layer
-from tensorflow.python.keras.models import Model
-from typing import List, Optional
+
 
 # ==============================================================================================================================
 # SINCODER

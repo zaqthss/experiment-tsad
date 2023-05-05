@@ -1,6 +1,9 @@
-from sklearn import metrics
-import numpy as np
 import math
+
+import numpy as np
+from sklearn import metrics
+
+
 # import matplotlib.pyplot as plt
 
 class metricor:

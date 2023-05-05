@@ -1,6 +1,7 @@
+from itertools import product
+
 import instanceFactory as fact
 import tools.fileHandler as fh
-from itertools import product
 
 dsName = "exercise"
 dsDir = "sub"

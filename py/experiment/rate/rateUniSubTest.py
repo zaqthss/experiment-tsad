@@ -1,26 +1,24 @@
 import os
-
-import algorithms.algorithm
-import instanceFactory as fact
-import tools.fileHandler as fh
-import metaData as meta
-from tools.metricsHandler import pointMetrics
 import time
+
+import instanceFactory as fact
+import metaData as meta
 import tools.dataHandler as dh
+import tools.fileHandler as fh
 
 dsName = "uni_subg_rate"
 
-algNames = ["BeatGAN"]
+algNames = ["NormA","BeatGAN"]
 metricType = "subsequence"
 metricNames = ["precision", "recall", "fmeasure"]
 outDir = "rate"
 hasSufix = True
-type="subs"
+type="subg"
 dsName = "uni_"+type+"_rate"
 sizes = ["5000"]
 len="50"
 seeds = ["1","2","3","4","5","6","7","8","9","10"]
-rates = ["0.05","0.075","0.1","0.125","0.15","0.175","0.2","0.225","0.25","0.275","0.3"]
+rates = ["0.05","0.075","0.1","0.125","0.15","0.175","0.2","0.225","0.25"]
 
 algMetrics = {}
 totalMetrics = {}
@@ -48,7 +46,7 @@ for rate in rates:
                                          dsName))
                     normaargs = meta.algorithmsParameters.get(algName).get(dsName)
                     k = int(float(rate) * float(size) / int(len))
-                    normaargs['top_k'] = k
+                    normaargs['top_k'] = k+1
                     if inst:
                         if not algMetrics.get(algName):
                             tm = {}
@@ -102,8 +100,8 @@ for rate in rates:
                             tm["time"] = 0.0
                             algMetrics[algName] = tm
                         start = time.time()
-                        k = int(float(rate) * float(size) / int(len)) + 1
-                        rseries,_ = inst.predict(trained_model, series, k)
+                        k = int(float(rate) * float(size) / int(len))
+                        rseries,_ = inst.predict(trained_model, series, int(k*0.8))
                         predictAnomaly = dh.getAnomalySequences(rseries)
                         fh.writeMiddleResult("rate/" + '_'.join([algName, dsName, rate, seed]), predictAnomaly)
                         algMetrics[algName]["time"] = float(

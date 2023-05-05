@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.edu.bit.cs.anomaly.entity.TimePointMulDim;
+import cn.edu.bit.cs.anomaly.util.SubseqScore;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
@@ -181,7 +183,7 @@ public class SAND implements UniDimAlgorithm {
     Score max_score = Collections.max(all_score);
     int max_index_begin = max_score.index;
     int index_list = all_score.indexOf(max_score);
-    for (int i = 0; i < Math.min(top_k, all_score.size()); i++) {
+    for (int i = 0; i < Math.min(this.top_k, all_score.size()); i++) {
       for (int j = max_index_begin;
            j < Math.min(pattern_length + max_index_begin, timeseries.getLength());
            j++) {
@@ -197,7 +199,25 @@ public class SAND implements UniDimAlgorithm {
       index_list = all_score.indexOf(max_score);
     }
   }
-
+  public void evaluate(double score_threshold) {
+    timeseries.clear();
+    int th_num=(int)(score_threshold*score.size());
+    if(th_num==0) return;
+    ArrayList<SubseqScore> all_score = new ArrayList<SubseqScore>();
+    for (int i = 0; i < score.size(); i++) {
+      SubseqScore s = new SubseqScore(i, score.get(i));
+      all_score.add(s);
+    }
+    Collections.sort(all_score);
+    Collections.reverse(all_score);
+    double th_value=all_score.get(th_num-1).getScore();
+    for (int i = 0; i < all_score.size(); i++) {
+      if(all_score.get(i).getScore()>=th_value){
+        int index=all_score.get(i).getIndex();
+        timeseries.getTimePoint(index).setIs_anomaly(IS_ANOMALY.TRUE);
+      }
+    }
+  }
   public ArrayList<Double> getScore(){
     return this.score;
   }

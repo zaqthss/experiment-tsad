@@ -20,10 +20,26 @@ import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as hac
 from scipy.cluster.hierarchy import fcluster
-from tqdm import tqdm
-from tslearn.clustering import KShape
 
 from .entropy_MDL import returnClustersMDL_AndSumMDL
+# COMMENT IF IN PYTHON3, KEEP IF PYTHON2
+#from __future__ import print_function
+
+import math
+
+import numpy as np
+import pandas as pd
+import scipy.cluster.hierarchy as hac
+from scipy.cluster.hierarchy import fcluster
+
+from .entropy_MDL import returnClustersMDL_AndSumMDL
+
+
+#######################################################################
+#######################################################################
+#####				NORMA NORMAL MODEL  FUNCTIONS				 ######
+#######################################################################
+#######################################################################
 
 
 #######################################################################

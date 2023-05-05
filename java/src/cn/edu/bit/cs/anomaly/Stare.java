@@ -76,4 +76,8 @@ public class Stare implements MultiDimAlgorithm {
       e.printStackTrace();
     }
   }
+
+  public void getScore(){
+
+  }
 }

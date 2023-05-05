@@ -6,20 +6,21 @@
 
 
 
+import math
 from typing import Dict
 
-from matplotlib import pyplot as plt
+import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
-from .algorithm import algorithm
+from entity import *
+from .NormAs.matrixprofile import *
 from .NormAs.nA_normalmodel import *
 from .NormAs.nA_recurrent_sequences import *
 from .NormAs.tools import *
-from .NormAs.matrixprofile import *
-from entity import *
-import math
+from .algorithm import Algorithm
 
-class NormA(algorithm):
+
+class NormA(Algorithm):
 
 	def __init__(self):
 		super(NormA, self).__init__()
@@ -60,6 +61,7 @@ class NormA(algorithm):
 		joinall = MinMaxScaler(feature_range=(0, 1)).fit_transform(joinall.reshape(-1, 1)).ravel()
 		joinall = np.array([joinall[0]] * math.ceil((self.pattern_length - 1) // 2) + list(joinall) + [joinall[-1]] * (
 				(self.pattern_length - 1) // 2))
+		self.score=joinall
 		score=np.argsort(join)
 		score=np.flipud(score)
 		reseries=self.series.copy()
@@ -72,6 +74,23 @@ class NormA(algorithm):
 			if len(score)==0:
 				break
 		return reseries,joinall
+
+	def evaluate(self,k):
+		reseries = self.series.copy()
+		reseries.clear()
+		score_sorted = np.argsort(self.score)
+		score_sorted = np.flipud(score_sorted)
+
+		for t in range(k):
+			index = score_sorted[0]
+			for i in range(index, min(index + self.pattern_length, len(reseries.timeseries))):
+				reseries.timeseries[i].is_anomaly = True
+			score_sorted = drop_score(score_sorted, index, pattern_length=self.pattern_length, len=len(self.series.timeseries))
+			if len(score_sorted) == 0:
+				break
+		return reseries
+
+
 
 def drop_score(all_score,index_start,pattern_length,len):
 	new_all_score=[]

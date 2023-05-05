@@ -1,17 +1,15 @@
 import os
-
-import algorithms.algorithm
-import instanceFactory as fact
-import tools.fileHandler as fh
-import metaData as meta
-from tools.metricsHandler import pointMetrics
 import time
+
+import instanceFactory as fact
+import metaData as meta
+import tools.fileHandler as fh
 
 algNames = ["NormA","BeatGAN"]
 metricType = "subsequence"
 len="50"
 size="5000"
-types=["subg","subs","subt"]
+types=["subg"]
 seeds = ["1","2","3","4","5","6","7","8","9","10"]
 rate="0.1"
 outDir = "type"

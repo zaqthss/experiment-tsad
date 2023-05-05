@@ -1,13 +1,12 @@
 import os
+import time
 import traceback
 
-import tools.dataHandler as dh
-import algorithms.algorithm
+from algorithms.algorithm import MachineLearningAlgorithm
 import instanceFactory as fact
-import tools.fileHandler as fh
 import metaData as meta
-from tools.metricsHandler import pointMetrics
-import time
+import tools.dataHandler as dh
+import tools.fileHandler as fh
 
 dsNames = ["exathlon_sp_pos", "uni_subg_sp_pos", "uni_subs_sp_pos", "uni_subt_sp_pos"]
 algNames = ["TranAD", "USAD", "GDN", "OmniAnomaly", "RCoder"]
@@ -25,32 +24,52 @@ totalMetrics = {}
 
 
 def runtest(dsName, size=None, rate=None, seed=None):
+    global training_series
     for algName in algNames:
         inst = fact.getAlgInstance(algName)
         if hasSufix:
-            series = fh.readMulDataWithLabel(
+            test_series = fh.readMulDataWithLabel(
                 os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
                              meta.dataSetsParameters.get(dsName).get("tedir"),
                              "_".join([dsName, size, rate, seed])))
-            if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
+            if isinstance(inst, MachineLearningAlgorithm):
                 if meta.dataSetsParameters.get(dsName).get("tdir") is None:
                     raise IOError("Trining file is needed")
-                triningSeries = fh.readMulDataWithLabel(
+                training_series = fh.readMulDataWithLabel(
                     os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
                                  meta.dataSetsParameters.get(dsName).get("tdir"),
                                  "_".join([dsName, size, rate, seed])))
+                valid_series = fh.readMulDataWithLabel(
+                    os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                 meta.dataSetsParameters.get(dsName).get("vdir"),
+                                 "_".join([dsName, size, rate, seed]) + "L"))
+            else:
+                valid_series = fh.readMulDataWithLabel(
+                    os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                 meta.dataSetsParameters.get(dsName).get("vdir"),
+                                 "_".join([dsName, size, rate, seed]) + "N"))
+
         else:
-            series = fh.readMulDataWithLabel(
+            test_series = fh.readMulDataWithLabel(
                 os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
                              meta.dataSetsParameters.get(dsName).get("tedir"),
                              dsName))
-            if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
+            if isinstance(inst, MachineLearningAlgorithm):
                 if meta.dataSetsParameters.get(dsName).get("tdir") is None:
                     raise IOError("Trining file is needed")
-                triningSeries = fh.readMulDataWithLabel(
+                training_series = fh.readMulDataWithLabel(
                     os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
                                  meta.dataSetsParameters.get(dsName).get("tdir"),
                                  dsName))
+                valid_series = fh.readMulDataWithLabel(
+                    os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                 meta.dataSetsParameters.get(dsName).get("vdir"),
+                                 dsName + "L"))
+            else:
+                valid_series = fh.readMulDataWithLabel(
+                    os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
+                                 meta.dataSetsParameters.get(dsName).get("vdir"),
+                                 dsName + "N"))
         args = meta.algorithmsParameters.get(algName).get(dsName)
 
         if inst:
@@ -63,17 +82,17 @@ def runtest(dsName, size=None, rate=None, seed=None):
                 algMetrics[algName] = tm
             try:
                 start = time.time()
-                if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
-                    inst.init(args, series.copy(), triningSeries)
-                    inst.training()
+                if isinstance(inst, MachineLearningAlgorithm):
+                    inst.init(args, test_series.copy(), training_series, valid_series)
+                    inst.training(writelossrate=False)
                 else:
-                    inst.init(args, series.copy())
+                    inst.init(args, test_series.copy(), valid_series)
                 rseries = inst.run()
                 algMetrics[algName]["time"] = float(algMetrics[algName].get("time")) + time.time() - start
                 predictAnomaly = dh.getAnomalySequences(rseries)
                 fh.writeMiddleResult(middleoutDir + "/" + '_'.join([algName, dsName, 'l', 'sub']), predictAnomaly)
                 mtools = fact.getMetricInstance(metricType)
-                mtools.init(series, rseries)
+                mtools.init(test_series, rseries)
                 for mn in metricNames:
                     algMetrics[algName][mn] = algMetrics[algName][mn] + getattr(mtools, mn, None)()
             except BaseException as be:

@@ -525,7 +525,7 @@ public class LRRDS implements MultiDimAlgorithm {
       sumup += Math.sqrt(x1[i] * x2[i]);
     }
     DecimalFormat df = new DecimalFormat("#.###");
-    sumup = Double.parseDouble(df.format(sumup));
+    sumup = Double.parseDouble(df.format(sumup).trim());
     sumdown = Double.parseDouble(df.format(sumdown));
     if (sumup == sumdown) {
       return 0;

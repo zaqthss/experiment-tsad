@@ -1,11 +1,6 @@
 package cn.edu.bit.cs.anomaly.total.acc;
 
-import cn.edu.bit.cs.anomaly.GrammarViz;
-import cn.edu.bit.cs.anomaly.LRRDS;
-import cn.edu.bit.cs.anomaly.Merlin;
-import cn.edu.bit.cs.anomaly.NeighborProfile;
-import cn.edu.bit.cs.anomaly.PBAD;
-import cn.edu.bit.cs.anomaly.SAND;
+import cn.edu.bit.cs.anomaly.*;
 import cn.edu.bit.cs.anomaly.entity.Range;
 import cn.edu.bit.cs.anomaly.entity.TimeSeries;
 import cn.edu.bit.cs.anomaly.entity.TimeSeriesMulDim;
@@ -29,10 +24,10 @@ public class UniSubTest {
   public static void main(String[] args) throws Exception {
     FileHandler fh = new FileHandler();
 
-    String[] vars = {"power"};
-    boolean[] willOperate = {false, false, false, false,true,false};
+    String[] vars = {"power","sed","taxi","machine"};
+    boolean[] willOperate = {false, false, false, false,false,false,true};
 
-    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP","MERLIN","GrammarViz"};
+    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP","MERLIN","GrammarViz","IDK"};
     String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
@@ -53,6 +48,7 @@ public class UniSubTest {
     NeighborProfile np = null;
     Merlin merlin=null;
     GrammarViz grammarviz=null;
+    IDK idk=null;
 
     double alpha = 0;
     POS_BIAS bias = POS_BIAS.FLAT;
@@ -217,11 +213,36 @@ public class UniSubTest {
         DataHandler.evaluate(
             alpha, bias, predictAnomaly, realAnomalyMap.get(dsName), metrics[index][algIndex]);
       }
+
+      // IDK
+      algIndex++;
+      if (willOperate[algIndex]) {
+        System.out.println(algNames[algIndex] + " begin");
+        if (!seriesMap.containsKey(dsName)) {
+          timeseries = fh.readDataWithLabel(rawPath);
+          seriesMap.put(dsName, timeseries);
+          if (!realAnomalyMap.containsKey(dsName)) {
+            ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeseries);
+            realAnomalyMap.put(dsName, realAnomaly);
+          }
+        } else {
+          timeseries = seriesMap.get(dsName);
+        }
+        algtime[algIndex][0] = System.currentTimeMillis();
+        idk = new IDK();
+        Map<String, Object> idkParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+        idk.init(idkParams, timeseries);
+        idk.run();
+        algtime[algIndex][1] = System.currentTimeMillis();
+        predictAnomaly = DataHandler.findAnomalyRange(timeseries);
+        DataHandler.evaluate(
+                alpha, bias, predictAnomaly, realAnomalyMap.get(dsName), metrics[index][algIndex]);
+      }
       for (int algi = 0; algi < ALGNUM; ++algi) {
         totaltime[index][algi] += algtime[algi][1] - algtime[algi][0];
       }
       // write results
-      //fh.writeResults("acc", "uni-sub-", vars, algNames, metricNames, totaltime, metrics, 1);
+      fh.writeResults("acc", "uni-sub-", vars, algNames, metricNames, totaltime, metrics, 1);
     } // end of rIndex
   }
 }

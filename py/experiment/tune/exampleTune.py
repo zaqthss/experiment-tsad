@@ -1,6 +1,7 @@
+from itertools import product
+
 import instanceFactory as fact
 import tools.fileHandler as fh
-from itertools import product
 
 dsName = "mul_pointc_10000_0.1_1"
 dsDir = "mul"

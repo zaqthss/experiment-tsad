@@ -5,7 +5,6 @@ import cn.edu.bit.cs.anomaly.util.Constants.IS_ANOMALY;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -476,17 +475,84 @@ public class FileHandler {
         datpw.flush();
         datpw.close();
       }
-      // time
-      datpw =
-          new PrintWriter(
-              new FileWriter("result/" + type + "/" + prefix + "-time-" + type + ".csv"));
-      datpw.println(head);
-      for (int i = 0; i < vars.length; ++i) {
-        datpw.print(vars[i] + sep);
-        for (int algi = 0; algi < algNames.length - 1; ++algi) {
-          datpw.print((double) (totaltime[i][algi]) / repeatNumber + sep);
+      if(totaltime!=null){
+        // time
+        datpw =
+                new PrintWriter(
+                        new FileWriter("result/" + type + "/" + prefix + "-time-" + type + ".csv"));
+        datpw.println(head);
+        for (int i = 0; i < vars.length; ++i) {
+          datpw.print(vars[i] + sep);
+          for (int algi = 0; algi < algNames.length - 1; ++algi) {
+            datpw.print((double) (totaltime[i][algi]) / repeatNumber + sep);
+          }
+          datpw.println((double) (totaltime[i][algNames.length - 1]) / repeatNumber);
         }
-        datpw.println((double) (totaltime[i][algNames.length - 1]) / repeatNumber);
+        datpw.flush();
+        datpw.close();
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void writeThresholdResults(
+          String type,
+          String prefix,
+          ArrayList<Double> vars,
+          String[] algNames,
+          String[] metricNames,
+          double[][][] totalcost,
+          int repeatNumber) {
+    // generate all .dat files
+    String sep = ",";
+    try {
+      PrintWriter datpw = null;
+      String head = type + sep + String.join(sep, metricNames);
+
+      //alg
+      for(int i=0;i<algNames.length;i++){
+        datpw =
+                new PrintWriter(
+                        new FileWriter(
+                                "result/" + type + "/" + prefix + "-" + algNames[i] + "-" + type + ".csv"));
+        datpw.println(head);
+        for (int j = 0; j < vars.size(); j++) {
+          datpw.print(vars.get(j).toString() + sep);
+          for (int mi = 0; mi < metricNames.length - 1; ++mi) {
+            datpw.print(totalcost[i][j][mi] / repeatNumber + sep);
+          }
+          datpw.println(totalcost[i][j][metricNames.length - 1] / repeatNumber);
+        }
+        datpw.flush();
+        datpw.close();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+  public void writeAUCResults(
+          String type,
+          String prefix,
+          String[] algNames,
+          String metricNames,
+          double[][] totalcost,
+          int repeatNumber) {
+    // generate all .dat files
+    String sep = ",";
+    try {
+      PrintWriter datpw = null;
+      String head = type + sep + String.join(sep, metricNames);
+      datpw =
+              new PrintWriter(
+                      new FileWriter(
+                              "result/" + type + "/" + prefix + "-"+ metricNames + ".csv"));
+      datpw.println(head);
+      for (int i = 0; i < algNames.length; i++) {
+        datpw.print(algNames[i] + sep);
+          //datpw.print(totalcost[i][0] / repeatNumber + sep);
+        datpw.println(totalcost[i][0] / repeatNumber);
       }
       datpw.flush();
       datpw.close();
@@ -494,7 +560,6 @@ public class FileHandler {
       e.printStackTrace();
     }
   }
-
   public static void main(String[] args) {
     System.out.println("file handler...");
 

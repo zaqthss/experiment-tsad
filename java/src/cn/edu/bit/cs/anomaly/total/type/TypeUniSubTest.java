@@ -1,11 +1,6 @@
 package cn.edu.bit.cs.anomaly.total.type;
 
-import cn.edu.bit.cs.anomaly.GrammarViz;
-import cn.edu.bit.cs.anomaly.LRRDS;
-import cn.edu.bit.cs.anomaly.Merlin;
-import cn.edu.bit.cs.anomaly.NeighborProfile;
-import cn.edu.bit.cs.anomaly.PBAD;
-import cn.edu.bit.cs.anomaly.SAND;
+import cn.edu.bit.cs.anomaly.*;
 import cn.edu.bit.cs.anomaly.entity.Range;
 import cn.edu.bit.cs.anomaly.entity.TimeSeries;
 import cn.edu.bit.cs.anomaly.entity.TimeSeriesMulDim;
@@ -58,9 +53,9 @@ public class TypeUniSubTest {
     FileHandler fh = new FileHandler();
 
     String[] vars = {"subg","subs","subt"};
-    boolean[] willOperate = {true,true, true, true,true, true};
+    boolean[] willOperate = {true,true, true, true,true, true,true};
 
-    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP","MERLIN","GrammarViz"};
+    String[] algNames = {"PBAD", "LRRDS", "SAND", "NP","MERLIN","GrammarViz","IDK"};
     String[] metricNames = {"precision", "recall","fmeasure"};
 
     final int VARSIZE = vars.length;
@@ -70,6 +65,7 @@ public class TypeUniSubTest {
     long[][] algtime = new long[ALGNUM][2];
     long[][] totaltime = new long[VARSIZE][ALGNUM];
     double[][][] metrics = new double[VARSIZE][ALGNUM][METRICNUM];
+    double[][][] seedmetrics = new double[seeds.size()+1][ALGNUM][METRICNUM];
 
     TimeSeries timeseries = null;
     TimeSeriesMulDim timeSeriesMulDim = null;
@@ -81,12 +77,14 @@ public class TypeUniSubTest {
     NeighborProfile np = null;
     Merlin merlin=null;
     GrammarViz grammarviz=null;
+    IDK idk=null;
     
     double alpha = 0;
     POS_BIAS bias = POS_BIAS.FLAT;
     ArrayList<Range> predictAnomaly = null;
 
     for (int index = 0; index < VARSIZE; ++index) {
+      seedmetrics = new double[seeds.size()+1][ALGNUM][METRICNUM];
       String rawPath =
           String.format("%s_%s_rate/test/%s_%s_len_%s_%s_%s_", dir, vars[index],filePrefix, vars[index], anomalyLength, size,
               anomalyRate);
@@ -118,8 +116,11 @@ public class TypeUniSubTest {
           predictAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
           DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
               metrics[index][algIndex]);
-          System.out.println();
+          DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
+                  seedmetrics[seed][algIndex]);
+
         }
+
       }
       // LRRDS
       algIndex++;
@@ -148,6 +149,8 @@ public class TypeUniSubTest {
           predictAnomaly = DataHandler.findAnomalyRange(timeSeriesMulDim);
           DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
               metrics[index][algIndex]);
+          DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
+                  seedmetrics[seed][algIndex]);
         }
       }
       // SAND
@@ -168,6 +171,8 @@ public class TypeUniSubTest {
           algtime[algIndex][0] = System.currentTimeMillis();
           sand = new SAND();
           Map<String, Object> sandParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+          int k=(int) (Integer.parseInt(size)*Double.parseDouble(anomalyRate))/50;
+          sandParams.put("top_k", k);
           sand.init(sandParams, timeseries);
           sand.run();
           algtime[algIndex][1] = System.currentTimeMillis();
@@ -176,6 +181,8 @@ public class TypeUniSubTest {
 
           DataHandler.evaluate(
               alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
+          DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
+                  seedmetrics[seed][algIndex]);
         }
       }
       // NP
@@ -196,6 +203,8 @@ public class TypeUniSubTest {
           algtime[algIndex][0] = System.currentTimeMillis();
           np = new NeighborProfile();
           Map<String, Object> npParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+          int k=(int) (Integer.parseInt(size)*Double.parseDouble(anomalyRate))/50+1;
+          npParams.put("top_k", k);
           np.init(npParams, timeseries);
           np.run();
           algtime[algIndex][1] = System.currentTimeMillis();
@@ -203,6 +212,9 @@ public class TypeUniSubTest {
           predictAnomaly = DataHandler.findAnomalyRange(timeseries);
           DataHandler.evaluate(
               alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
+          DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
+                  seedmetrics[seed][algIndex]);
+
         }
       }
       // MERLIN
@@ -223,6 +235,8 @@ public class TypeUniSubTest {
           algtime[algIndex][0] = System.currentTimeMillis();
           merlin = new Merlin();
           Map<String, Object> merlinParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+          int k=(int) (Integer.parseInt(size)*Double.parseDouble(anomalyRate))/Integer.parseInt(anomalyLength);
+          merlinParams.put("top_k", k);
           merlin.init(merlinParams, timeseries);
           merlin.run();
           algtime[algIndex][1] = System.currentTimeMillis();
@@ -230,6 +244,8 @@ public class TypeUniSubTest {
           predictAnomaly = DataHandler.findAnomalyRange(timeseries);
           DataHandler.evaluate(
               alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
+          DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
+                  seedmetrics[seed][algIndex]);
         }
       }
       
@@ -251,6 +267,8 @@ public class TypeUniSubTest {
           algtime[algIndex][0] = System.currentTimeMillis();
           grammarviz = new GrammarViz();
           Map<String, Object> grammarvizParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+          int k=(int) (Integer.parseInt(size)*Double.parseDouble(anomalyRate))/Integer.parseInt(anomalyLength);
+          grammarvizParams.put("DISCORDS_NUM", k);
           grammarviz.init(grammarvizParams, timeseries);
           grammarviz.run();
           algtime[algIndex][1] = System.currentTimeMillis();
@@ -258,11 +276,52 @@ public class TypeUniSubTest {
           predictAnomaly = DataHandler.findAnomalyRange(timeseries);
           DataHandler.evaluate(
               alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
+
+          DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
+                  seedmetrics[seed][algIndex]);
+        }
+      }
+      // IDK
+      algIndex++;
+      if (willOperate[algIndex]) {
+        for (int seed : seeds) {
+          System.out.println(algNames[algIndex] + " begin on seed " + seed);
+          if (!seriesMap.containsKey(seed)) {
+            timeseries = fh.readDataWithLabel(rawPath + seed + ".csv");
+            seriesMap.put(seed, timeseries);
+            if (!realAnomalyMap.containsKey(seed)) {
+              ArrayList<Range> realAnomaly = DataHandler.findAnomalyRange(timeseries);
+              realAnomalyMap.put(seed, realAnomaly);
+            }
+          } else {
+            timeseries = seriesMap.get(seed);
+          }
+          algtime[algIndex][0] = System.currentTimeMillis();
+          idk = new IDK();
+          Map<String, Object> idkParams = meta.getDataAlgParam().get(dsName).get(algNames[algIndex]);
+          int k=(int) (Integer.parseInt(size)*Double.parseDouble(anomalyRate))/Integer.parseInt(anomalyLength);
+          idkParams.put("top_k", k);
+          idk.init(idkParams, timeseries);
+          idk.run();
+          algtime[algIndex][1] = System.currentTimeMillis();
+          totaltime[index][algIndex] += algtime[algIndex][1] - algtime[algIndex][0];
+          predictAnomaly = DataHandler.findAnomalyRange(timeseries);
+          String dumpPath = String.format(
+                  "%s/%s_%s_%s_%s.csv", "../middle/rate", algNames[algIndex], dsName, vars[index],seed);
+          fh.writeAnomalyRange(predictAnomaly, dumpPath);
+          DataHandler.evaluate(
+                  alpha, bias, predictAnomaly, realAnomalyMap.get(seed), metrics[index][algIndex]);
+          DataHandler.evaluate(alpha, bias, predictAnomaly, realAnomalyMap.get(seed),
+                  seedmetrics[seed][algIndex]);
         }
       }
       // write results
+      //fh.writeResults(
+      //   "type", "" + "uni_sub", vars, algNames, metricNames, totaltime, metrics, seeds.size());
+      String[] sds = {"0","1","2","3","4","5","6","7","8","9","10"};
+      // write results
       fh.writeResults(
-         "type", "" + "uni_sub", vars, algNames, metricNames, totaltime, metrics, seeds.size());
+              "type", "" + vars[index], sds, algNames, metricNames, null, seedmetrics, 1);
     } // end of rIndex
   }
 }

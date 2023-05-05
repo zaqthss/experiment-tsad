@@ -1,14 +1,10 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import pickle
 import dgl
 from dgl.nn import GATConv
-from torch.nn import TransformerEncoder
 from torch.nn import TransformerDecoder
-from .dlutils import *
+from torch.nn import TransformerEncoder
+
 from .constants import constants
+from .dlutils import *
 
 torch.manual_seed(1)
 
@@ -72,9 +68,9 @@ class LSTM_AD(nn.Module):
 
     def forward(self, x):
         hidden = (
-        torch.rand(1, 1, self.n_hidden, dtype=torch.float64), torch.randn(1, 1, self.n_hidden, dtype=torch.float64))
+            torch.rand(1, 1, self.n_hidden, dtype=torch.float64), torch.randn(1, 1, self.n_hidden, dtype=torch.float64))
         hidden2 = (
-        torch.rand(1, 1, self.n_feats, dtype=torch.float64), torch.randn(1, 1, self.n_feats, dtype=torch.float64))
+            torch.rand(1, 1, self.n_feats, dtype=torch.float64), torch.randn(1, 1, self.n_feats, dtype=torch.float64))
         outputs = []
         for i, g in enumerate(x):
             out, hidden = self.lstm(g.view(1, 1, -1), hidden)
@@ -135,11 +131,12 @@ class OmniAnomaly(nn.Module):
     def __init__(self, feats):
         super(OmniAnomaly, self).__init__()
         self.name = 'OmniAnomaly'
-        self.lr = constants.lr[self.name]
-        self.beta = 0.01
+        para = constants.Hyperparameters[self.name]
+        self.lr = para["lr"]
+        self.beta = para["beta"]  # 0.01
+        self.n_latent = para["n_latent"]  # 8
         self.n_feats = feats
         self.n_hidden = 32
-        self.n_latent = 8
         self.lstm = nn.GRU(feats, self.n_hidden, 2)
         self.encoder = nn.Sequential(
             nn.Linear(self.n_hidden, self.n_hidden), nn.PReLU(),
@@ -173,11 +170,12 @@ class USAD(nn.Module):
     def __init__(self, feats):
         super(USAD, self).__init__()
         self.name = 'USAD'
-        self.lr = constants.lr[self.name]
+        para = constants.Hyperparameters[self.name]
+        self.lr = para["lr"]
+        self.n_latent = para["n_latent"]
+        self.n_window = para["n_window"]  # USAD w_size = 5
         self.n_feats = feats
         self.n_hidden = 16
-        self.n_latent = 5
-        self.n_window = 5  # USAD w_size = 5
         self.n = self.n_feats * self.n_window
         self.encoder = nn.Sequential(
             nn.Flatten(),
@@ -300,9 +298,10 @@ class GDN(nn.Module):
     def __init__(self, feats):
         super(GDN, self).__init__()
         self.name = 'GDN'
-        self.lr = constants.lr[self.name]
+        para = constants.Hyperparameters[self.name]
+        self.lr = para["lr"]
+        self.n_window = para["n_window"]  # 5
         self.n_feats = feats
-        self.n_window = 5
         self.n_hidden = 16
         self.n = self.n_window * self.n_feats
         src_ids = np.repeat(np.array(list(range(feats))), feats)
@@ -370,12 +369,12 @@ class TranAD(nn.Module):
     def __init__(self, feats):
         super(TranAD, self).__init__()
         self.name = 'TranAD'
-        self.lr = constants.lr[self.name]
-        self.batch = 128
+        para = constants.Hyperparameters[self.name]
+        self.lr = para["lr"]
+        self.batch = para["batch"]
+        self.n_window = para["n_window"]
         self.n_feats = feats
-        self.n_window = 10
         self.n = self.n_feats * self.n_window
-        #print((self.lr, constants.dffw[self.name], constants.window[self.name]))
         self.pos_encoder = PositionalEncoding(2 * feats, 0.1, self.n_window)
         encoder_layers = TransformerEncoderLayer(d_model=2 * feats, nhead=feats,
                                                  dim_feedforward=16, dropout=0.1)

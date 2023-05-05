@@ -13,12 +13,16 @@ public class RangeMetric {
     public double recall = 0;
     public double precision = 0;
     public double fmeasure = 0;
+    public double fpr=0;
+    public double fnr=0;
 
     private ArrayList<Range> realAnomaly, predictAnomaly;
+    private ArrayList<Range> realNormal, predictNormal;
     private HashMap<Integer, Range> overlaps;
     private int[] hitR; // length = realAnomaly.size()
     private int[] hitP;
     private int rSize = 0, pSize = 0;
+    private int rnSize = 0, pnSize = 0;
     private POS_BIAS pos_bias = POS_BIAS.FLAT;
 
     public void computeMetric(
@@ -60,6 +64,7 @@ public class RangeMetric {
             fmeasure = 2 * precision * recall / (precision + recall);
         }
     }
+
 
     private int calcKey(int rIndex, int pIndex) {
         return rIndex * pSize + pIndex;

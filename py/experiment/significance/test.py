@@ -5,9 +5,9 @@
 #         Pierre-Alain Muller <pierre-alain.muller@uha.fr>
 # License: GPL3
 
+import matplotlib
 import numpy as np
 import pandas as pd
-import matplotlib
 
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
@@ -109,8 +109,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
         canvas = FigureCanvasAgg(fig)
         canvas.print_figure(*args, **kwargs)
 
-    sums = avranks
-
+    sums = np.around(avranks,1)
     nnames = names
     ssums = sums
 
@@ -205,7 +204,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
               (textspace - 0.1, chei)],
              linewidth=linewidth)
         if labels:
-            text(textspace + 0.3, chei - 0.075, format(ssums[i], '.4f'), ha="right", va="center", size=10)
+            text(textspace + 0.3, chei - 0.075, format(ssums[i], '.1f'), ha="right", va="center", size=15)
         text(textspace - 0.2, chei, filter_names(nnames[i]), ha="right", va="center", size=16)
 
     for i in range(math.ceil(k / 2), k):
@@ -215,7 +214,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
               (textspace + scalewidth + 0.1, chei)],
              linewidth=linewidth)
         if labels:
-            text(textspace + scalewidth - 0.3, chei - 0.075, format(ssums[i], '.4f'), ha="left", va="center", size=10)
+            text(textspace + scalewidth - 0.3, chei - 0.075, format(ssums[i], '.1f'), ha="left", va="center", size=15)
         text(textspace + scalewidth + 0.2, chei, filter_names(nnames[i]),
              ha="left", va="center", size=16)
 
@@ -394,36 +393,36 @@ def draw_cd_diagram(p_values,average_ranks, alpha=0.1, title=None, filename=None
     plt.rc('axes', titlesize=f_size, labelsize=f_size)
     #title='(a) subg'
     if title:
-        plt.title(title,y=0.9, x=0.5)
+        plt.title(title,y=-0.2, x=0.5)
     plt.savefig('result/significance/cd-diagram-'+filename+'.eps',bbox_inches='tight')
 
 alpha=0.05
-filepath='../tsad/result/type/uni_sub-fmeasure-type.csv'
+'''filepath='../tsad/result/type/uni_sub-fmeasure-type.csv'
 df_perf=preprocess(filepath)
 flag=friedman_test(df_perf=df_perf, alpha=alpha)
 if flag:
     p_values=wilcoxon_test(df_perf=df_perf, alpha=alpha)
     average_ranks=averagerank(df_perf=df_perf)
-    draw_cd_diagram(p_values, average_ranks,title='Accuracy', filename=dataset,labels=True)
+    draw_cd_diagram(p_values, average_ranks,title='', filename='haha',labels=True)'''
 
 dataset='subg'
-filepath='../tsad/result/type/uni_'+dataset+'-fmeasure.csv'
+filepath='../tsad/result/type/'+dataset+'-fmeasure-type.csv'
 df_perf=preprocess(filepath)
 flag=friedman_test(df_perf=df_perf, alpha=alpha)
 if flag:
     p_values=wilcoxon_test(df_perf=df_perf, alpha=alpha)
     average_ranks=averagerank(df_perf=df_perf)
-    draw_cd_diagram(p_values, average_ranks,title='(a) subg', filename=dataset,labels=True)
+    draw_cd_diagram(p_values, average_ranks,title='', filename=dataset,labels=True)
 
 dataset='subs'
-filepath='../tsad/result/type/uni_'+dataset+'-fmeasure.csv'
+filepath='../tsad/result/type/'+dataset+'-fmeasure-type.csv'
 df_perf=preprocess(filepath)
 flag=friedman_test(df_perf=df_perf, alpha=alpha)
 if flag:
     p_values=wilcoxon_test(df_perf=df_perf, alpha=alpha)
     average_ranks=averagerank(df_perf=df_perf)
     draw_cd_diagram(p_values, average_ranks,title='(b) subs', filename=dataset,labels=True)
-
+'''
 dataset='subt'
 filepath='../tsad/result/type/uni_'+dataset+'-fmeasure.csv'
 df_perf=preprocess(filepath)
@@ -431,4 +430,4 @@ flag=friedman_test(df_perf=df_perf, alpha=alpha)
 if flag:
     p_values=wilcoxon_test(df_perf=df_perf, alpha=alpha)
     average_ranks=averagerank(df_perf=df_perf)
-    draw_cd_diagram(p_values, average_ranks,title='(c) subt', filename=dataset,labels=True)
+    draw_cd_diagram(p_values, average_ranks,title='(c) subt', filename=dataset,labels=True)'''

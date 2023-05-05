@@ -1,12 +1,12 @@
-from random import random
-
-import torch
 import os
+
 import numpy as np
+import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
-from .preprocess import load_datasetwithSeries,param_default
+
+from .preprocess import param_default
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

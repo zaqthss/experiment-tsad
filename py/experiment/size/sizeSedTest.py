@@ -1,13 +1,9 @@
 import os
+import time
 
-import algorithms.algorithm
 import instanceFactory as fact
-import tools.fileHandler as fh
 import metaData as meta
-from tools.metricsHandler import pointMetrics
-import time
-
-import time
+import tools.fileHandler as fh
 
 dsName = "sed_size"
 

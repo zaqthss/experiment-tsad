@@ -1,9 +1,11 @@
 from typing import Dict
-from .algorithm import algorithm
+
 from entity import *
 from .UFEKTS.ufekt_method import *
+from .algorithm import Algorithm
 
-class UFEKT(algorithm):
+
+class UFEKT(Algorithm):
     def __init__(self):
         super(UFEKT, self).__init__()
         self.series = None

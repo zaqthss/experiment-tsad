@@ -1,8 +1,9 @@
 import numpy as np
-
-from .spot import SPOT
-from .constants import *
 from sklearn.metrics import *
+
+from .constants import *
+from .spot import SPOT
+
 
 def calc_point2point(predict, actual):
     """
@@ -132,7 +133,7 @@ def pot_eval(init_score, score, label,alg, q=1e-5, level=0.02):
     Returns:
         dict: pot result dict
     """
-    lms = constants.lm[alg][0]
+    lms = constants.Hyperparameters[alg]["lm"][0]
     while True:
         try:
             s = SPOT(q)  # SPOT object
@@ -143,7 +144,7 @@ def pot_eval(init_score, score, label,alg, q=1e-5, level=0.02):
     ret = s.run(dynamic=False)  # run
     # print(len(ret['alarms']))
     # print(len(ret['thresholds']))
-    pot_th = np.mean(ret['thresholds']) * constants.lm[alg][1]
+    pot_th = np.mean(ret['thresholds']) * constants.Hyperparameters[alg]["lm"][1]
     # pot_th = np.percentile(score, 100 * lm[0])
     # np.percentile(score, 100 * lm[0])
     pred, p_latency = adjust_predicts(score, label, pot_th, calc_latency=True)

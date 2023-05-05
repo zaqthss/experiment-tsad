@@ -232,7 +232,6 @@ public class DataHandler {
     }
     return anomaly;
   }
-
   public static ArrayList<Range> transPointToRange(TreeSet<Long> pointAnomaly) {
     ArrayList<Range> rangeAnomaly = new ArrayList<>();
 
@@ -275,6 +274,26 @@ public class DataHandler {
     metrics[2] += sm.fmeasure;
   }
 
+  // uni point to uni alg
+  public static void evaluate_false(TimeSeries timeseries, TreeMap<Long, TimePoint> realAnomaly,
+                              double[] metrics) {
+    TreeMap<Long, TimePoint> predictAnomaly = DataHandler.findAnomalyPoint(timeseries);
+    SingleMetric sm = new SingleMetric();
+    sm.computeMetric(realAnomaly, predictAnomaly, timeseries);
+    metrics[0] += sm.fpr;
+    metrics[1] += sm.fnr;
+  }
+  public static void evaluate_false(TimeSeriesMulDim timeseries, TreeMap<Long, TimePointMulDim> realAnomaly,
+                              double[] metrics) {
+    TreeMap<Long, TimePointMulDim> predictAnomaly = DataHandler.findAnomalyPoint(timeseries);
+    SingleMetric sm = new SingleMetric();
+    sm.computeMetric(realAnomaly, predictAnomaly, timeseries);
+    metrics[0] += sm.fpr;
+    metrics[1] += sm.fnr;
+  }
+
+
+
   // mul point to uni alg
   public static void evaluate(TimeSeries[] predictTsArray, TreeMap<Long, TimePointMulDim> realAnomaly,
       double[] metrics) {
@@ -302,7 +321,9 @@ public class DataHandler {
     rm.computeMetric(alpha, bias, realAnomaly, predictAnomaly);
     metrics[0] += rm.precision;
     metrics[1] += rm.recall;
-    metrics[2] += rm.fmeasure;
+    if(metrics.length>2){
+      metrics[2] += rm.fmeasure;
+    }
   }
 
   // mul range to uni alg
@@ -338,6 +359,7 @@ public class DataHandler {
 	    metrics[1] += rm.recall;
 	    metrics[2] += rm.fmeasure;
   }
+
   
   public static String[] transToDims(List<Integer> dimList, int maxDim) {
     List<Integer> filterList = new ArrayList<>();
@@ -361,4 +383,6 @@ public class DataHandler {
       System.out.println(b);
     }
   }
+
+
 }

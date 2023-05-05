@@ -1,12 +1,10 @@
 import os
-
-import algorithms.algorithm
-import instanceFactory as fact
-import tools.fileHandler as fh
-import tools.dataHandler as dh
-import metaData as meta
-from tools.metricsHandler import pointMetrics
 import time
+
+from algorithms.algorithm import MachineLearningAlgorithm
+import instanceFactory as fact
+import metaData as meta
+import tools.fileHandler as fh
 
 dsNames = ["sed"]
 algNames = ["NormA"]
@@ -30,7 +28,7 @@ def runtest(dsName, size=None, rate=None, seed=None):
                 os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
                              meta.dataSetsParameters.get(dsName).get("tedir"),
                              "_".join([dsName, size, rate, seed])))
-            if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
+            if isinstance(inst, MachineLearningAlgorithm):
                 if meta.dataSetsParameters.get(dsName).get("tdir") is None:
                     raise IOError("Training file is needed")
                 trainingSeries = fh.readMulDataWithLabel(
@@ -42,7 +40,7 @@ def runtest(dsName, size=None, rate=None, seed=None):
                 os.path.join(meta.dataSetsParameters.get(dsName).get("dir"),
                              meta.dataSetsParameters.get(dsName).get("tedir"),
                              meta.dataSetsParameters.get(dsName).get("prefix")))
-            if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
+            if isinstance(inst, MachineLearningAlgorithm):
                 if meta.dataSetsParameters.get(dsName).get("tdir") is None:
                     raise IOError("Training file is needed")
                 trainingSeries = fh.readMulDataWithLabel(
@@ -59,7 +57,7 @@ def runtest(dsName, size=None, rate=None, seed=None):
                 tm["algName"] = algName
                 algMetrics[algName] = tm
             start = time.time()
-            if inst.__class__.__base__ is algorithms.algorithm.machineLearningAlgorithm:
+            if isinstance(inst, MachineLearningAlgorithm):
                 inst.init(args, series, trainingSeries)
             else:
                 inst.init(args, series)

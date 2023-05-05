@@ -7,10 +7,11 @@ SciencePlots
 scikit-learn==0.24.2
 xlrd==1.2.0
 scipy==1.7.1
-torch==1.8.1+cpu
+torch>=1.8.1
 tslearn>=0.1.29
 tensorly==0.5.0
 joblib >= 1.0.0
-keras==2.9.0
+keras>=2.9.0
 spectrum >= 0.7.5
-tensorflow >= 2.1.0
+tensorflow <= 2.10.0
+datetime

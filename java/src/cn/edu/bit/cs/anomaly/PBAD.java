@@ -138,34 +138,28 @@ public class PBAD implements MultiDimAlgorithm {
         tpm.setIs_anomaly(IS_ANOMALY.TRUE);
       }
     }
-    /*ArrayList<PBADScore> all_score = new ArrayList<PBADScore>();
-    for (int i = 0; i < joinall.size(); i++) {
-      PBADScore s = new PBADScore(i, joinall.get(i));
+  }
+  public void evaluate(double score_threshold) {
+    MulT.clear();
+    int th_num=(int)(score_threshold*score.size());
+    if(th_num==0) return;
+    ArrayList<SubseqScore> all_score = new ArrayList<SubseqScore>();
+    for (int i = 0; i < score.size(); i++) {
+      SubseqScore s = new SubseqScore(i, score.get(i));
       all_score.add(s);
     }
     Collections.sort(all_score);
     Collections.reverse(all_score);
-    int top_k = (int) Math.ceil(threshold * all_score.size())/window_size;
-    PBADScore max_score = Collections.max(all_score);
-    int max_index_begin = max_score.index;
-    int index_list = all_score.indexOf(max_score);
-    for (int i = 0; i < Math.min(top_k, all_score.size()); i++) {
-      for (int j = max_index_begin;
-           j < Math.min(window_size + max_index_begin, MulT.getLength());
-           j++) {
-        TimePointMulDim tpm = (TimePointMulDim) MulT.getTimeseries().get(j);
+    double th_value=all_score.get(th_num-1).getScore();
+    for (int i = 0; i < all_score.size(); i++) {
+      if(all_score.get(i).getScore()>=th_value){
+        int index=all_score.get(i).getIndex();
+        TimePointMulDim tpm = (TimePointMulDim) MulT.getTimeseries().get(index);
         tpm.setIs_anomaly(IS_ANOMALY.TRUE);
       }
-      all_score = drop_score(all_score, index_list);
-      if(all_score.size()==0) {
-        break;
-      }
-      // next max
-      max_score = Collections.max(all_score);
-      max_index_begin = max_score.index;
-      index_list = all_score.indexOf(max_score);
-    }*/
+    }
   }
+
   private ArrayList<PBADScore> drop_score(ArrayList<PBADScore> all_score, int index_list) {
     ArrayList<PBADScore> new_all_score = new ArrayList<PBADScore>();
     new_all_score.addAll(all_score);

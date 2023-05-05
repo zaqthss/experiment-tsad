@@ -1,20 +1,18 @@
 import os
-
-import algorithms.algorithm
-import instanceFactory as fact
-import tools.fileHandler as fh
-import metaData as meta
-from tools.metricsHandler import pointMetrics
 import time
-import tools.dataHandler as dh
 
-dsName = "uni_subs_size"
+import instanceFactory as fact
+import metaData as meta
+import tools.dataHandler as dh
+import tools.fileHandler as fh
+
+dsName = "uni_subg_size"
 outDir = "size"
-algNames = ["BeatGAN"]
+algNames = ["NormA","BeatGAN"]
 metricType = "subsequence"
 metricNames = ["precision", "recall", "fmeasure"]
 hasSufix = True
-type="subs"
+type="subg"
 sizes = ["1000","2000","5000","10000", "20000","50000","100000"]
 len="50"
 seeds = ["1","2","3","4","5","6","7","8","9","10"]
@@ -56,7 +54,7 @@ for size in sizes:
                             algMetrics[algName] = tm
                         start = time.time()
                         inst.init(normaargs, series.copy())
-                        rseries = inst.run()
+                        rseries,_ = inst.run()
                         predictAnomaly = dh.getAnomalySequences(rseries)
                         fh.writeMiddleResult("size/" + '_'.join([algName, dsName, size, seed]), predictAnomaly)
                         algMetrics[algName]["time"] = float(algMetrics[algName].get("time")) + time.time() - start

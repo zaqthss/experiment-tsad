@@ -1,17 +1,11 @@
-import math
 import os
-
-import numpy as np
-import pandas as pd
-
-from metrics import metricor
-from sklearn.preprocessing import MinMaxScaler
-import algorithms.algorithm
-import instanceFactory as fact
-import tools.fileHandler as fh
-import metaData as meta
 import time
+
+import instanceFactory as fact
+import metaData as meta
 import tools.dataHandler as dh
+import tools.fileHandler as fh
+from metrics import metricor
 
 '''label=pd.read_csv("C:/Users/17658/Documents/label.csv",header=None);
 label=np.array(label)
