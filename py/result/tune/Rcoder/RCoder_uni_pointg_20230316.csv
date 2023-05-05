@@ -1,6 +1,0 @@
-S,delta,batch_size,freq_warmup,sin_warmup,epoch,precision,recall,fmeasure
-5,0.05,180,10,10,5,Error,Error,Error
-5,0.05,180,10,10,10,Error,Error,Error
-5,0.05,180,10,10,20,Error,Error,Error
-5,0.05,180,10,10,40,Error,Error,Error
-5,0.05,180,10,10,80,Error,Error,Error

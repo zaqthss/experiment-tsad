@@ -1,3 +1,0 @@
-lr,beta,n_latent,epoch,dsName,precision,recall,fmeasure
-0.01,0.01,8,5,uni_pointg,1.0,0.4924924924924925,0.6599597585513078
-0.01,0.01,8,10,uni_pointg,Error,Error,Error

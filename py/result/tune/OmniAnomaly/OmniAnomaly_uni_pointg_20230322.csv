@@ -1,9 +1,0 @@
-lr,beta,n_latent,epoch,precision,recall,fmeasure
-0.01,0.01,8,5,Error,Error,Error
-0.01,0.01,8,5,Error,Error,Error
-0.01,0.01,8,10,Error,Error,Error
-0.01,0.01,8,50,Error,Error,Error
-0.01,0.01,8,100,Error,Error,Error
-0.01,0.01,8,200,Error,Error,Error
-0.01,0.01,8,5,uni_pointg,Error,Error,Error
-0.01,0.01,8,5,uni_pointg,Error,Error,Error

@@ -1,5 +1,0 @@
-lr,n_window,epoch,precision,recall,fmeasure
-0.01,5,5,Error,Error,Error
-0.01,5,5,Error,Error,Error
-0.01,5,10,Error,Error,Error
-0.01,5,5,uni_pointg,Error,Error,Error

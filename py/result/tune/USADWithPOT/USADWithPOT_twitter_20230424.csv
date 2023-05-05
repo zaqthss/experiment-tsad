@@ -1,2 +1,0 @@
-lr,n_latent,n_window,epoch,lm,dsName,precision,recall,fmeasure
-0.01,5,5,5,"(0.999, 1)",twitter,0.0,0.0,-1.0
