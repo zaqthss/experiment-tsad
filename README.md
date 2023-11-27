@@ -14,6 +14,31 @@ To ease reproducibility, we put it in Google Drive  https://drive.google.com/dri
 - python: 3.7
 - modules needed: java in [lib](https://github.com/zaqthss/experiment-tsad/tree/main/java/lib), python in [requirements.txt](https://github.com/zaqthss/experiment-tsad/blob/main/py/requirements.txt)
 
+## Code Structure
+
+* Section 4.2.1 Varying Datasets
+  * acc
+* Section 4.2.2 Varying Anomaly Rate
+  * rate
+* Section 4.2.3 Varying Data Size
+  * size
+* Section 4.2.4 Varying Data Dimension
+  * dim
+* Section 4.2.5 Varying Anomaly Patterns
+  * type
+* Section 4.3.1 Univariate Methods in Multivariate Datasets
+  * inter/UMPerDimTest
+* Section 4.3.2 Online Methods in Batched Time Series
+  * inter/SlideTest
+* Section 4.3.3 Point Methods in Subsequence Anomalies
+  * inter/SPLengthTest
+* Section 4.3.4  Effect of Metrics and Adjustment
+  * inter/AdjustPredictTest
+* Section 4.3.5  Effect of Threshold
+  * threshold
+* Section 4.3.6  Application
+  * application
+
 ## Example Invocation
 
 Take the code of drawing Table 4 as an example:
